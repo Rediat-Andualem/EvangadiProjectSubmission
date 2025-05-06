@@ -1,118 +1,88 @@
-
 const bcrypt = require('bcrypt');
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
-    userNameId: {
+    userId: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       primaryKey: true,
     },
-    userName: {
+    userFirstName: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: {
-        args: true,
-        msg: "User Name Already Taken",
-      },
+    },
+    userLastName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    userEmail: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
       validate: {
-        notEmpty: { msg: "User Name cannot be empty" },
-        is: {
-          args: /^[a-zA-Z0-9_!@#$%^&*()+=\-{}\[\]|\\:;"'<>,.?/~`]*$/,
-          msg: "User name should only contain alphabets and special characters",
-        },
+        isEmail: true,
       },
     },
-    email: {
+    userPhoneNumber: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: {
-        args: true,
-        msg: "You can't create an account with this email",
-      },
-      validate: {
-        notEmpty: { msg: "Email cannot be empty" },
-        isEmail: { msg: "Invalid Email Address" },
-      },
+    },
+    Group: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    Batch: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    Year: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
-        notEmpty: { msg: "Password cannot be empty" },
-        len: {
-          args: [6, undefined],
-          msg: "Password should be at least 6 characters long",
-        },
-        is: {
-          args: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/,
-          msg: "Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 6 characters long",
-        },
-      },
     },
     role: {
-      type: DataTypes.ENUM("0","1", "2", "3", "4"),
+      type: DataTypes.ENUM("0", "1", "2", "3", "4"),
       defaultValue: '0',
     },
-    sq1: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    sqa1: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: { msg: "Answer cannot be empty" },
-      }
-    },
-    passwordUpdateLink: {
-      type: DataTypes.STRING,
-      defaultValue: null,
-    },
-    passwordUpdateLinkCreatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-    passwordAttempt: {
-      type: DataTypes.STRING,
-    }
   }, {
     timestamps: true,
   });
 
   User.associate = models => {
     User.hasMany(models.Advert, {
-      foreignKey: 'userNameId',
+      foreignKey: 'userId',
       onDelete: 'CASCADE',
     });
-    User.hasMany(models.Job, {
-      foreignKey: 'userNameId',
+    User.hasMany(models.Project, {
+      foreignKey: 'userId',
       onDelete: 'CASCADE',
     });
   };
+
   // Function to ensure the super admin exists
-  const ensureSuperAdminExists = async () => {
+  User.ensureSuperAdminExists = async () => {
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash('ProjectSubmissionAdmin@524334', salt);
+    const hashedPassword = await bcrypt.hash(process.env.SUPER_ADMIN_PASSWORD, salt);
 
     await User.findOrCreate({
-      where: { email: "rediat_ta@ch.iitr.ac.in" },
+      where: { userEmail: "rediat_ta@ch.iitr.ac.in" },
       defaults: {
-        userName: "Rediat",
-        email: "rediat_ta@ch.iitr.ac.in",
-        sq1: "what is the most precious item you purchased?",
-        sqa1: "gold",
-        role: '1',
+        userFirstName: "Rediat",
+        userLastName: "",
+        userEmail: "rediat_ta@ch.iitr.ac.in",
+        userPhoneNumber: "",
+        Group: "admin",
+        Batch: "admin",
+        Year: "admin",
         password: hashedPassword,
+        role: '1',
       },
     });
   };
 
-  // Hook to ensure the super admin exists after the User model is synchronized
-  sequelize.sync().then(() => {
-    ensureSuperAdminExists()
-      .then(() => console.log(""))
-      .catch(err => console.error("Error ensuring super admin:", err));
-  });
   return User;
 };
