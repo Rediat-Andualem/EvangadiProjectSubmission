@@ -45,6 +45,7 @@ db.syncTablesInOrder = async () => {
   try {
     await db.User.sync({ alter: true });
     await db.Project.sync({ alter: true });
+    await db.ProjectSubmission.sync({ alter: true });
     console.log('Tables created in order successfully');
   } catch (error) {
     console.error('Error syncing tables:', error);

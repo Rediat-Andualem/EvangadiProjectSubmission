@@ -45,25 +45,21 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM("0", "1", "2", "3", "4"),
-      defaultValue: '0',
+      type: DataTypes.ENUM("0", "1", "2", "3", "4"), 
     },
   }, {
     timestamps: true,
   });
 
-  User.associate = models => {
-    User.hasMany(models.Advert, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE',
-    });
-    User.hasMany(models.Project, {
+  // Define associations
+  User.associate = (models) => {
+    User.hasMany(models.ProjectSubmission, {
       foreignKey: 'userId',
       onDelete: 'CASCADE',
     });
   };
 
-  // Function to ensure the super admin exists
+  // Static method to ensure super admin exists
   User.ensureSuperAdminExists = async () => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(process.env.SUPER_ADMIN_PASSWORD, salt);
@@ -73,13 +69,12 @@ module.exports = (sequelize, DataTypes) => {
       defaults: {
         userFirstName: "Rediat",
         userLastName: "",
-        userEmail: "rediat_ta@ch.iitr.ac.in",
         userPhoneNumber: "",
         Group: "admin",
         Batch: "admin",
         Year: "admin",
         password: hashedPassword,
-        role: '1',
+        role: "1", // adjust as per role meaning
       },
     });
   };

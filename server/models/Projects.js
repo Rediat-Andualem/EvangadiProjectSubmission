@@ -9,22 +9,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      githubCodeLink: {
+      projectDescription: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
-      deployedLink: {
+      projectResource: {
         type: DataTypes.STRING,
         allowNull: true, 
-      },
-      projectType: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      ReviewersComment: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
+      }
     }, {
       timestamps: true, 
     });

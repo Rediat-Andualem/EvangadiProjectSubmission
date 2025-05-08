@@ -1,18 +1,11 @@
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const { Op } = require('sequelize');
-
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
-const dotenv = require("dotenv");
 const { sequelize, User, RefreshToken } = require("../models");
-const { SecurityQuestion } = require("../models");
-const { axiosInstance } = require("../utility/axiosInstance.js");
-// initialize cors
-dotenv.config();
 
 
-dotenv.config();
 
 const userC = async (req, res) => {
   const {
@@ -112,7 +105,6 @@ const userC = async (req, res) => {
 };
 
 
-
 const verifyEmail = async (req, res) => {
   const { encryptedJWT, encryptionKey, iv } = req.body;
 
@@ -173,10 +165,6 @@ const verifyEmail = async (req, res) => {
 };
 
 
-
-
-
-
 const loginC = async (req, res) => {
   const { userEmail, password } = req.body;
 
@@ -225,11 +213,6 @@ const loginC = async (req, res) => {
     res.status(500).json({ message: "Server error." });
   }
 };
-
-
-
-
-
 
 
 
@@ -393,12 +376,6 @@ const forgotPassword = async (req, res) => {
 };
 
 
-
-
-
-
-
-
 const updateUserPassword = async (req, res) => {
   const { user_new_password } = req.body;
   const { userNameId } = req.params;
@@ -449,11 +426,6 @@ const updateUserPassword = async (req, res) => {
 };
 
 
-
-
-
-
-
 const allUserFinder = async (req, res) => {
   try {
     // Fetch all users, excluding password field
@@ -474,14 +446,6 @@ const allUserFinder = async (req, res) => {
     return res.status(500).json({ errors: [err.message] });
   }
 };
-
-
-
-
-
-
-
-
 
 
 const singleUserFinder = async (req, res) => {
@@ -506,9 +470,6 @@ const singleUserFinder = async (req, res) => {
     return res.status(500).json({ errors: [err.message] });
   }
 };
-
-
-
 
 
 module.exports = {
