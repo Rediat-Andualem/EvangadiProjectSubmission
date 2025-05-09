@@ -29,12 +29,6 @@ const userC = async (req, res) => {
     errors.push("Password must be at least 6 characters long");
   }
 
-  const personalEmailDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com"];
-  const emailDomain = userEmail.split("@")[1];
-  if (!personalEmailDomains.includes(emailDomain)) {
-    errors.push("Please use a personal email address (e.g., Gmail, Yahoo, Outlook, etc.)");
-  }
-
   if (errors.length > 0) {
     return res.status(400).json({ errors });
   }
@@ -49,91 +43,7 @@ const userC = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
 
-    const tokenPayload = {
-      userFirstName,
-      userLastName,
-      userEmail,
-      userPhoneNumber,
-      Group,
-      Batch,
-      Year,
-      hashPassword,
-    };
-
-    const accessToken = jwt.sign(tokenPayload, process.env.JWT_SECRET_KEY, { expiresIn: "1d" });
-
-    const encryptionKey = crypto.randomBytes(32);
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv("aes-256-ctr", encryptionKey, iv);
-    let encryptedJWT = cipher.update(accessToken, "utf8", "hex");
-    encryptedJWT += cipher.final("hex");
-
-    const base64EncodedJWT = encodeURIComponent(Buffer.from(encryptedJWT).toString("base64"));
-    const base64EncodedKey = encodeURIComponent(Buffer.from(encryptionKey).toString("base64"));
-    const base64EncodedIV = encodeURIComponent(Buffer.from(iv).toString("base64"));
-
-    const verificationLink = `${process.env.FRONTEND_URL}/users/verify/${base64EncodedJWT}/${base64EncodedKey}/${base64EncodedIV}`;
-
-    const mailSender = nodemailer.createTransport({
-      service: "gmail",
-      port: 465,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    await mailSender.sendMail({
-      from: process.env.EMAIL_USER,
-      to: userEmail,
-      subject: "ACCOUNT VERIFICATION",
-      html: `
-        <h3>Verify Your Account</h3>
-        <p>Click the button below to verify your account.</p>
-        <a href="${verificationLink}" style="padding:10px 20px;background:#A34054;color:white;text-decoration:none;border-radius:5px;">Verify</a>
-        <p>Link expires in 1 day.</p>
-      `,
-    });
-
-    return res.status(200).json({
-      message: "Registration successful! Please check your email to verify your account.",
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error during registration." });
-  }
-};
-
-
-const verifyEmail = async (req, res) => {
-  const { encryptedJWT, encryptionKey, iv } = req.body;
-
-  try {
-    const decodedJWT = Buffer.from(decodeURIComponent(encryptedJWT), "base64").toString("utf-8");
-    const decodedKey = Buffer.from(decodeURIComponent(encryptionKey), "base64");
-    const decodedIV = Buffer.from(decodeURIComponent(iv), "base64");
-
-    const decipher = crypto.createDecipheriv("aes-256-ctr", decodedKey, decodedIV);
-    let decrypted = decipher.update(decodedJWT, "hex", "utf8");
-    decrypted += decipher.final("utf8");
-
-    jwt.verify(decrypted, process.env.JWT_SECRET_KEY, async (err, decoded) => {
-      if (err) {
-        return res.status(400).json({ message: "Invalid or expired verification link." });
-      }
-
-      const {
-        userFirstName,
-        userLastName,
-        userEmail,
-        userPhoneNumber,
-        Group,
-        Batch,
-        Year,
-        hashPassword,
-      } = decoded;
-
-      const newUser = await User.create({
+const newUser = await User.create({
         userFirstName,
         userLastName,
         userEmail,
@@ -142,7 +52,7 @@ const verifyEmail = async (req, res) => {
         Batch,
         Year,
         password: hashPassword,
-        role: '0', // default role
+        role: '0', 
       });
 
       const authToken = jwt.sign(
@@ -150,19 +60,21 @@ const verifyEmail = async (req, res) => {
           userId: newUser.userId,
           userEmail: newUser.userEmail,
           role: newUser.role,
+          userName:newUser.userFirstName
         },
         process.env.JWT_SECRET_KEY,
         { expiresIn: "30d" }
       );
 
       res.setHeader("Authorization", `Bearer ${authToken}`);
-      res.status(201).json({ message: "Account verified and user created successfully" });
-    });
+      res.status(201).json({ message: "User profile created successfully" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Error during email verification" });
+    res.status(500).json({ message: "Server error during registration." });
   }
 };
+
+
 
 
 const loginC = async (req, res) => {
@@ -186,23 +98,14 @@ const loginC = async (req, res) => {
 
     // JWT payload
     const payload = {
-      userId: user.id, // or user.userId depending on your DB
+      userId: user.userId, 
       userEmail: user.userEmail,
-      role: user.role
+      role: user.role,
+      userFirstName: user.userFirstName
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
       expiresIn: "30d"
-    });
-
-    const refreshToken = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
-      expiresIn: "7d"
-    });
-
-    // Save refresh token
-    await RefreshToken.create({
-      refreshToken,
-      userId: user.id
     });
 
     // Set token in response header
@@ -217,7 +120,7 @@ const loginC = async (req, res) => {
 
 
 const deleteUser = async (req, res) => {
-  const { userId } = req.params; // userId, not userNameId
+  const { userId } = req.params; 
   const t = await sequelize.transaction();
 
   try {
@@ -228,14 +131,9 @@ const deleteUser = async (req, res) => {
     }
 
     // Prevent deleting superAdmin (role = 3)
-    if (user.role === "3") {
+    if (user.role === "1") {
       return res.status(400).json({ message: "Super admin cannot be deleted." });
     }
-
-    // Optional: Also delete associated data (e.g., Adverts, Jobs)
-    // await Advert.destroy({ where: { userId }, transaction: t });
-    // await Job.destroy({ where: { userId }, transaction: t });
-
     await user.destroy({ transaction: t });
 
     await t.commit();
@@ -254,8 +152,8 @@ const forgotPassword = async (req, res) => {
 
   try {
     const user = await User.findOne({
-      attributes: ["userId", "email"],
-      where: { email },
+      attributes: ["userId", "userEmail"],
+      where: { userEmail : email },
     });
 
     if (!user) {
@@ -264,15 +162,15 @@ const forgotPassword = async (req, res) => {
 
     const updateLink = `${process.env.FRONTEND_URL}/reset-password/${user.userId}`;
 
-    await User.update(
-      {
-        passwordUpdateLink: updateLink,
-        passwordUpdateLinkCreatedAt: new Date(),
-      },
-      {
-        where: { userId: user.userId },
-      }
-    );
+    // await User.update(
+    //   {
+    //     passwordUpdateLink: updateLink,
+    //     passwordUpdateLinkCreatedAt: new Date(),
+    //   },
+    //   {
+    //     where: { userId: user.userId },
+    //   }
+    // );
 
     const mailSender = nodemailer.createTransport({
       service: "gmail",
@@ -285,7 +183,7 @@ const forgotPassword = async (req, res) => {
 
     const emailContent = {
       from: process.env.EMAIL_USER,
-      to: user.email,
+      to: user.userEmail,
       subject: "Password Reset Request",
       html: `
       <!DOCTYPE html>
@@ -346,7 +244,7 @@ const forgotPassword = async (req, res) => {
               <div class="content">
                   <h1>Update your password</h1>
                   <p>Click the button below to update your password.</p>
-                  <a href="${updateLinkFromDB}" class="cta-button">Update Password</a>
+                  <a href="${updateLink}" class="cta-button">Update Password</a>
           </div>
           <div class="footer">
               <p>Link will expire in <b>5min</b><p>
@@ -378,25 +276,16 @@ const forgotPassword = async (req, res) => {
 
 const updateUserPassword = async (req, res) => {
   const { user_new_password } = req.body;
-  const { userNameId } = req.params;
+  const { userId } = req.params;
 
   try {
     const userData = await User.findOne({
-      attributes: ["userNameId", "passwordUpdateLinkCreatedAt"],
-      where: { userNameId },
+      attributes: ["userId"],
+      where: { userId },
     });
 
     if (!userData) {
       return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if the link is still valid (within 5 minutes)
-    const createdAt = new Date(userData.passwordUpdateLinkCreatedAt);
-    const now = new Date();
-    const diffMinutes = (now - createdAt) / (1000 * 60);
-
-    if (diffMinutes > 5) {
-      return res.status(400).json({ message: "Password reset link has expired." });
     }
 
     // Hash and update the new password
@@ -406,10 +295,8 @@ const updateUserPassword = async (req, res) => {
     const [updated] = await User.update(
       {
         password: hashedPassword,
-        passwordUpdateLink: null,
-        passwordUpdateLinkCreatedAt: null,
       },
-      { where: { userNameId } }
+      { where: { userId } }
     );
 
     if (updated > 0) {
@@ -449,14 +336,14 @@ const allUserFinder = async (req, res) => {
 
 
 const singleUserFinder = async (req, res) => {
-  const { userNameId } = req.params;
+  const { userId } = req.params;
 
-  if (!userNameId) {
+  if (!userId) {
     return res.status(400).json({ errors: ["User ID not provided."] });
   }
 
   try {
-    const user = await User.findByPk(userNameId, {
+    const user = await User.findByPk(userId, {
       attributes: { exclude: ["password"] },
     });
 
@@ -474,7 +361,6 @@ const singleUserFinder = async (req, res) => {
 
 module.exports = {
   userC,
-  verifyEmail,
   loginC,
   deleteUser,
   forgotPassword,

@@ -7,8 +7,9 @@ const createProject = async (req, res) => {
     deployedLink,
     projectType,
     ReviewersComment,
-    userId,
   } = req.body;
+
+const {userId} =req.user
 
   if (!submittedProjectName || !githubCodeLink || !projectType || !userId) {
     return res.status(400).json({ message: "Missing required fields." });
@@ -31,38 +32,15 @@ const createProject = async (req, res) => {
       userId,
     });
 
-    return res.status(201).json({ message: "Project created successfully", project: newProject });
+    return res.status(201).json({ message: "Project Submitted successfully", project: newProject });
   } catch (error) {
     console.error("Error creating project:", error.message);
     return res.status(500).json({ message: "Failed to create project", error: error.message });
   }
 };
 
-
-const deleteProject = async (req, res) => {
-  const { submittedProjectId } = req.params;
-
-  if (!submittedProjectId) {
-    return res.status(400).json({ message: "Project ID not provided." });
-  }
-
-  try {
-    const deletedCount = await ProjectSubmission.destroy({ where: { submittedProjectId } });
-
-    if (deletedCount === 0) {
-      return res.status(404).json({ message: "Project not found." });
-    }
-
-    return res.status(200).json({ message: "Project deleted successfully." });
-  } catch (error) {
-    console.error("Error deleting project:", error.message);
-    return res.status(500).json({ message: "Failed to delete project", error: error.message });
-  }
-};
-
-
 const getProjectByStudent = async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user;
 
   if (!userId) {
     return res.status(400).json({ message: "User ID is required." });
@@ -86,36 +64,37 @@ const getProjectByStudent = async (req, res) => {
 };
 
 
+
 const updateProjectByStudent = async (req, res) => {
-  const { submittedProjectId } = req.params;
+  const { projectId } = req.params;
+  const {userId}=req.user
   const {
     submittedProjectName,
     githubCodeLink,
     deployedLink,
     projectType,
-    ReviewersComment,
-    userId,
+    ReviewersComment
   } = req.body;
 
-  if (!submittedProjectId || !userId) {
+  if (!projectId || !userId) {
     return res.status(400).json({ message: "Project ID and User ID are required." });
   }
 
   try {
     const project = await ProjectSubmission.findOne({
-      where: { submittedProjectId, userId },
+      where: {submittedProjectId : projectId  , userId },
     });
 
     if (!project) {
       return res.status(404).json({ message: "Project not found or not owned by this student." });
     }
 
-    if (deployedLink && deployedLink !== project.deployedLink) {
-      const existing = await ProjectSubmission.findOne({ where: { deployedLink } });
-      if (existing) {
-        return res.status(409).json({ message: "This deployed link is already in use." });
-      }
-    }
+    // if (deployedLink && deployedLink !== project.deployedLink) {
+    //   const existing = await ProjectSubmission.findOne({ where: { deployedLink } });
+    //   if (existing) {
+    //     return res.status(409).json({ message: "This deployed link is already in use." });
+    //   }
+    // }
 
     await project.update({
       submittedProjectName: submittedProjectName || project.submittedProjectName,
@@ -131,6 +110,32 @@ const updateProjectByStudent = async (req, res) => {
     return res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+
+const deleteProject = async (req, res) => {
+  const { projectId } = req.params;
+
+  if (!projectId) {
+    return res.status(400).json({ message: "Project ID not provided." });
+  }
+
+  try {
+    const deletedCount = await ProjectSubmission.destroy({ where: { submittedProjectId : projectId } });
+
+    if (deletedCount === 0) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
+    return res.status(200).json({ message: "Project deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting project:", error.message);
+    return res.status(500).json({ message: "Failed to delete project", error: error.message });
+  }
+};
+
+
+
+
+
 
 
 module.exports = {

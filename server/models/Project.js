@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
       projectResource: {
         type: DataTypes.STRING,
         allowNull: true, 
+      },
+      ProjectDeadLine: {
+        type: DataTypes.STRING,
+        allowNull: true, 
       }
     }, {
       timestamps: true, 
