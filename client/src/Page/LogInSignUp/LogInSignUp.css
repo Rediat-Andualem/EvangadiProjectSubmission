@@ -1,0 +1,133 @@
+.loginSignUp {
+  text-align: center;
+}
+
+span {
+  color: #192533;
+}
+span:hover {
+  text-decoration: underline;
+}
+form {
+  margin-top: 30px;
+}
+
+.form-input input {
+  padding: 10px 15px;
+  width: 100%;
+  margin-top: 15px;
+  border-radius: 5px;
+  border: 0.5px solid #cacaca;
+  outline: none;
+}
+
+.form-input select {
+  padding: 10px 15px;
+  width: 100%;
+  margin-top: 15px;
+  border-radius: 5px;
+  border: 0.5px solid #cacaca;
+  outline: none;
+}
+ 
+.form-input input:focus {
+  /* animation: border-appear 0.2s linear; */
+  
+}
+@keyframes border-appear {
+  from {
+      border-bottom: 2px solid transparent; 
+      width: 0; 
+  }
+  to {
+      border-bottom: 2px solid #192533;
+      width: 100%; 
+  } 
+}
+
+.login > div,
+.register > div {
+  padding: 0 10px;
+  font-size: 0.9rem;
+}
+.forgot a {
+  display: block;
+  text-decoration: none;
+  color: #192533;
+  text-align: right;
+  margin-top: 15px;
+}
+.forgot a:hover {
+  text-decoration: underline;
+}
+
+.btn-login > button {
+  font-size: 1rem;
+  padding: 5px 10px;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  margin-top: 30px;
+  color: white;
+  background-color: #192533;
+}
+
+.btn-login > button:hover {
+  background-color: #192533;
+}
+.btn-register > button {
+  font-size: 1rem;
+  padding: 5px 10px;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  margin-top: 20px;
+  color: white;
+  background-color: #192533;
+}
+.success-message{
+  color: #A34054;
+  font-weight: bold;
+}
+.spn-signupIn{
+  font-weight: bold;
+}
+.error-message{
+  color: red;
+  font-weight: bold;
+}
+.btn-register > button:hover {
+  background-color: #192533;
+}
+.privacy {
+  margin-top: 15px;
+  font-size: 0.7rem;
+  a {
+    color: #192533;
+  }
+}
+.password {
+  position: relative;
+}
+.password span {
+  position: absolute;
+  top: 35%;
+  right: 5%;
+  font-size: 1.2rem;
+  color: #848484;
+}
+.password span:hover {
+  /* color: #192533; */
+  color: #A34054;
+}
+.disabled {
+  cursor: not-allowed;
+}
+.disabled:hover {
+  background-color: #848484 !important;
+}
+.spn-signupIn{
+  color: #A34054;
+}
+
+/* background-color: #192533; */
