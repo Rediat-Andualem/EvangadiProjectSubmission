@@ -4,15 +4,14 @@ const {checkRole,authenticateToken} = require('../Auth/Auth.js')
 
 let userCreateRouter = express.Router();
 
-userCreateRouter.post('/createUser', userC); // checked
-userCreateRouter.post('/login', loginC); // checked
-userCreateRouter.delete('/deleteUser/:userNameId',authenticateToken,checkRole(["1"]), deleteUser); // checked
-userCreateRouter.post('/email-pass', forgotPassword); // checked
-userCreateRouter.post('/updatePassword/:userNameId',updateUserPassword ); // checked
-userCreateRouter.post('/verify',verifyEmail ); // checked
-// userCreateRouter.post('/privilege/:userNameId',authenticateToken,checkRole(["1"]),grantPrivilege ); // checked
-userCreateRouter.get('/allUsers',allUserFinder ); // checked
-userCreateRouter.get('/singleUser/:userNameId',authenticateToken,checkRole(["1"]),singleUserFinder ); // checked
+userCreateRouter.post('/createUser', userC); // 
+userCreateRouter.post('/login', loginC); // 
+userCreateRouter.delete('/deleteUser/:userNameId',authenticateToken,checkRole(["1"]), deleteUser); // 
+userCreateRouter.post('/email-pass', forgotPassword); // 
+userCreateRouter.post('/updatePassword/:userNameId',updateUserPassword ); // 
+userCreateRouter.post('/verify',verifyEmail ); // 
+userCreateRouter.get('/allUsers',allUserFinder ); // 
+userCreateRouter.get('/singleUser/:userNameId',authenticateToken,checkRole(["1"]),singleUserFinder ); // 
 
 
 

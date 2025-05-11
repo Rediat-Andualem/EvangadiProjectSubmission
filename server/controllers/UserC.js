@@ -29,11 +29,11 @@ const userC = async (req, res) => {
     errors.push("Password must be at least 6 characters long");
   }
 
-  const personalEmailDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com"];
-  const emailDomain = userEmail.split("@")[1];
-  if (!personalEmailDomains.includes(emailDomain)) {
-    errors.push("Please use a personal email address (e.g., Gmail, Yahoo, Outlook, etc.)");
-  }
+  // const personalEmailDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com"];
+  // const emailDomain = userEmail.split("@")[1];
+  // if (!personalEmailDomains.includes(emailDomain)) {
+  //   errors.push("Please use a personal email address (e.g., Gmail, Yahoo, Outlook, etc.)");
+  // }
 
   if (errors.length > 0) {
     return res.status(400).json({ errors });
@@ -84,15 +84,79 @@ const userC = async (req, res) => {
     });
 
     await mailSender.sendMail({
-      from: process.env.EMAIL_USER,
+      from: 'evangadiproject@gmail.com',
       to: userEmail,
       subject: "ACCOUNT VERIFICATION",
       html: `
-        <h3>Verify Your Account</h3>
-        <p>Click the button below to verify your account.</p>
-        <a href="${verificationLink}" style="padding:10px 20px;background:#A34054;color:white;text-decoration:none;border-radius:5px;">Verify</a>
-        <p>Link expires in 1 day.</p>
-      `,
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Account Verification</title>
+          <style>
+              body {
+                  font-family: Arial, sans-serif;
+                  background-color: #f6f6f6;
+                  margin: 0;
+                  padding: 0;
+              }
+              .container {
+                  max-width: 600px;
+                  margin: 0 auto;
+                  background-color: #ffffff;
+                  padding: 20px;
+                  border-radius: 8px;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                  border: 1px solid #cccccc;
+              }
+              .header {
+                  text-align: center;
+                  padding: 10px 0;
+              }
+              .header img {
+                  max-width: 100px;
+              }
+              .content {
+                  text-align: center;
+                  padding: 20px;
+              }
+              .cta-button {
+                  display: inline-block;
+                  padding: 15px 25px;
+                  margin: 20px 0;
+               background-color: #A34054;
+              color: #ffffff !important;
+                  font-weight: bold;
+                  text-decoration: none;
+                  border-radius: 5px;
+              }
+              .footer {
+                  text-align: center;
+                  padding: 10px 0;
+                  font-size: 12px;
+                  color: #777777;
+              }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <div class="header">
+              </div>
+              <div class="content">
+                  <h1>Account Verification</h1>
+                  <p>Click the button below to verify your account.</p>
+                  <a href="${verificationLink}" class="cta-button">Verify My Account</a>
+          </div>
+          <div class="footer">
+              <p>Link will expire in <b>1 day</b><p>
+              <br>
+              <p>If you did not sign up for this account, please ignore this email.</p>
+          </div>
+      </div>
+      </body>
+      </html>
+    `,
     });
 
     return res.status(200).json({
