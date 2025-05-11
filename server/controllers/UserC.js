@@ -60,7 +60,7 @@ const newUser = await User.create({
           userId: newUser.userId,
           userEmail: newUser.userEmail,
           role: newUser.role,
-          userName:newUser.userFirstName
+          userFirstName:newUser.userFirstName
         },
         process.env.JWT_SECRET_KEY,
         { expiresIn: "30d" }

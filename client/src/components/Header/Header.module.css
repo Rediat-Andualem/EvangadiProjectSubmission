@@ -1,0 +1,39 @@
+.forTheNavbar{
+	background-color: #3B455A !important;
+	color: white !important;
+}
+
+.forLink{
+	color: white;
+	text-decoration: none;
+}
+
+.logo{
+	height: 25px;
+}
+
+.forTextColor{
+	color: white !important;
+	margin: 10px;
+}
+.underline:hover{
+  border-bottom: 0.5px solid red;
+}
+
+.forButton{
+	background-color: #492E3E !important;
+	color: white !important;
+	font-weight: bold !important;
+}
+
+/* .forLink :hover{
+ color: #492E3E !important;
+} */
+
+
+.forButton:hover{
+	background-color: white !important;
+	color: #492E3E !important;
+	font-weight: bold;
+
+}

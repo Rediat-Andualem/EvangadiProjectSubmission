@@ -6,8 +6,12 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
     },
     submittedProjectName: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
+      references: {
+        model: 'Projects',
+        key: 'projectId',
+      },
     },
     githubCodeLink: {
       type: DataTypes.STRING,
@@ -19,7 +23,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     projectType: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: "Individual",
+    },
+    ProjectUpdateStatus: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue:true 
     },
     ReviewersComment: {
       type: DataTypes.STRING,
@@ -34,7 +44,13 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'userId',
       onDelete: 'CASCADE',
     });
+    
+    ProjectSubmission.belongsTo(models.Project, {
+      foreignKey: 'projectId', 
+      onDelete: 'CASCADE',
+    });
   };
+  
 
   return ProjectSubmission;
 };

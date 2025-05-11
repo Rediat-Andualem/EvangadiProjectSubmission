@@ -9,7 +9,7 @@ const { checkRole, authenticateToken } = require("../Auth/Auth.js");
 let ProjectForStudentsRoute = express.Router();
 
 ProjectForStudentsRoute.post("/createProjectForStudents",authenticateToken, checkRole(['1']), createProjectForStudents);
-ProjectForStudentsRoute.get("/getProjectsForStudents",authenticateToken,checkRole(['1']),getProjectsCreatedForStudents);
+ProjectForStudentsRoute.get("/getProjectsForStudents",authenticateToken,getProjectsCreatedForStudents);
 ProjectForStudentsRoute.delete("/deleteProjectForStudents/:projectId",authenticateToken,checkRole(['1']),deleteProjectForStudents);
 
 

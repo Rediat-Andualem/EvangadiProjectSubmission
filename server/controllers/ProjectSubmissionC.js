@@ -1,6 +1,8 @@
-const { ProjectSubmission } = require('../models');
+const { where } = require('sequelize');
+const { ProjectSubmission ,  Project} = require('../models');
 
 const createProject = async (req, res) => {
+  
   const {
     submittedProjectName,
     githubCodeLink,
@@ -8,10 +10,9 @@ const createProject = async (req, res) => {
     projectType,
     ReviewersComment,
   } = req.body;
-
 const {userId} =req.user
 
-  if (!submittedProjectName || !githubCodeLink || !projectType || !userId) {
+  if (!submittedProjectName || !githubCodeLink || !userId) {
     return res.status(400).json({ message: "Missing required fields." });
   }
 
@@ -40,7 +41,7 @@ const {userId} =req.user
 };
 
 const getProjectByStudent = async (req, res) => {
-  const { userId } = req.user;
+  const { userId } = req.user; 
 
   if (!userId) {
     return res.status(400).json({ message: "User ID is required." });
@@ -50,20 +51,26 @@ const getProjectByStudent = async (req, res) => {
     const projects = await ProjectSubmission.findAll({
       where: { userId },
       order: [['createdAt', 'DESC']],
+      include: [
+        {
+          model: Project,
+          attributes: ['ProjectDeadLine','nameOfProject'], 
+          required: true, 
+        },
+      ],
     });
-
+    console.log("6",projects)
     if (projects.length === 0) {
-      return res.status(200).json({ message: "No projects submitted by this student." });
+      return res.status(200).json([]);
     }
 
-    return res.status(200).json({ projects });
+    // Returning the projects with the joined ProjectDeadLine
+    return res.status(200).json(projects);
   } catch (error) {
     console.error("Error fetching student projects:", error.message);
     return res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
-
-
 
 const updateProjectByStudent = async (req, res) => {
   const { projectId } = req.params;

@@ -1,38 +1,138 @@
-import React, { useState } from 'react';
-import styles from './ProjectSubmissionPage.module.css';
-import amazon from '../../assets/Amazon.png'
-import netflix from '../../assets/netflix.png'
-import forum from '../../assets/forum.jpg' 
-import portfolio from '../../assets/profile.jpg'
+import React, { useEffect, useState } from "react";
+import styles from "./ProjectSubmissionPage.module.css";
+import amazon from "../../assets/Amazon.png";
+import netflix from "../../assets/netflix.png";
+import forum from "../../assets/forum.jpg";
+import portfolio from "../../assets/profile.jpg";
+import { axiosInstance } from "../../utility/axiosInstance";
+import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { PiSmileySadThin } from "react-icons/pi"; 
+
+//  for table view
+import { DataGrid } from "@mui/x-data-grid";
+import Paper from "@mui/material/Paper";
+import Button from "react-bootstrap/Button";
+
 function ProjectSubmissionPage() {
   const [formData, setFormData] = useState({
-    submittedProjectName: '',
-    githubCodeLink: '',
-    deployedLink: '',
-    projectType: '',
-    ReviewersComment: ''
+    submittedProjectName: "",
+    githubCodeLink: "",
+    deployedLink: "",
+    projectType: "",
+    ReviewersComment: "",
   });
-
+  const [projectCollection, setProjectCollection] = useState([]);
+  const [submittedProjects, setSubmittedProjects] = useState([]);
+  useEffect(() => {
+    getProjects();
+    getSubmittedProjects();
+  }, []);
+  const authHeader = useAuthHeader();
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Submitted Project:', formData);
+  // get projects
+  const getProjects = async () => {
+    try {
+      let projectsList = await axiosInstance.get(
+        "/projectCreation/getProjectsForStudents",
+        {
+          headers: {
+            Authorization: authHeader,
+          },
+        }
+      );
+      setProjectCollection(projectsList.data.projects);
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
+  //  submit projects
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Submitted Project:", formData);
+    try {
+      let submitProject = await axiosInstance.post(
+        "/projectSubmission/submitProject",
+        formData,
+        {
+          headers: {
+            Authorization: authHeader,
+          },
+        }
+      );
+      console.log(submitProject.data);
+      toast.success("Project submitted successfully! 🎉");
+      getSubmittedProjects();
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.response.data? error.response.data.message : "Something went wrong. Please try again.");
+    }
+  };
+
+  // get submitted projects
+  const getSubmittedProjects = async () => {
+    try {
+      let getSubmittedProjects = await axiosInstance.get(
+        "/projectSubmission/getStudentProject",
+        {
+          headers: {
+            Authorization: authHeader,
+          },
+        }
+      );
+      setSubmittedProjects(getSubmittedProjects.data );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+console.log(submittedProjects)
+
+  //  list of project name and picture at the top
   const projects = [
-    { name: 'Netflix', img: netflix },
-    { name: 'Amazon', img: amazon },
-    { name: 'Evangadi Forum', img: forum},
-    { name: 'Portfolio Website', img: portfolio }
+    { name: "Netflix", img: netflix },
+    { name: "Amazon", img: amazon },
+    { name: "Evangadi Forum", img: forum },
+    { name: "Portfolio Website", img: portfolio },
   ];
+  //  table columns
+  const columns = [
+
+    { field: "submittedProjectName", headerName: "Submitted Project Name", width: 180 },
+    { field: "githubCodeLink", headerName: "Github Link", width: 250 },
+    { field: "deployedLink", headerName: "Deployed Link", width: 250 },
+    { field: "ReviewersComment", headerName: "Reviewers Comment", width: 300 },
+    {
+      field: "action",
+      headerName: "Action",
+      renderCell: (params) => (
+        <>
+          <Button
+            style={{ margin: "5px" }}
+            onClick={() => deleteUser(params?.row.userId, params?.row.role)}
+            variant="danger"
+          >
+            Delete
+          </Button>
+          <ToastContainer />
+        </>
+      ),
+      width: 150,
+    },
+  ];
+console.log(formData)
+  const paginationModel = { page: 0, pageSize: 10 };
 
   return (
     <>
-          <div className="container mx-auto row m-4">
-        {projects.map((project, index) => (
+      <div className="container mx-auto row m-4">
+        {projects?.map((project, index) => (
           <div className="col-6 col-md-3 text-center mb-3" key={index}>
             <img
               src={project.img}
@@ -43,92 +143,104 @@ function ProjectSubmissionPage() {
           </div>
         ))}
       </div>
-    <div className= {`${styles.formPart} mt-5`}>
-      {/* Responsive Image Grid */}
+      <marquee
+        behavior="scroll"
+        direction="left"
+        className=" fw-bold fst-italic"
+      >
+        Please submit your projects on time. Certificates and other necessary
+        confirmations will only be provided to students who submit their
+        projects on time.
+      </marquee>
 
-
-      {/* Submission Form */}
-      <form onSubmit={handleSubmit} className={styles.projectForm}>
-               <div className="mb-3">
-          <label className="form-label">Project Type</label>
-          <select
-            name="projectType"
-            value={formData.projectType}
-            onChange={handleChange}
-            className="form-select"
-            required
-          >
-            <option value="">-- Select Type --</option>
-            {projects.map((project, index) => (
-              <option key={index} value={project.name}>
-                {project.name}
+      <div className={`${styles.formPart} mt-5`}>
+        {/* Responsive Image Grid */}
+        {/* Submission Form */}
+        <form onSubmit={handleSubmit} className={styles.projectForm}>
+          <div className="mb-3">
+            <label className="form-label">Project Name</label>
+            <select
+              name="submittedProjectName"
+              value={formData.submittedProjectName}
+              onChange={handleChange}
+              className="form-select"
+              required
+            >
+              <option value="" disabled>
+                Select project
               </option>
-            ))}
-          </select>
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Project Name</label>
-          <input
-            type="text"
-            name="submittedProjectName"
-            value={formData.submittedProjectName}
-            onChange={handleChange}
-            className="form-control"
-            placeholder="Enter your project name"
-            required
-          />
-        </div>
+              {projectCollection?.map((project, index) => (
+                <option key={index} value={project.projectId}>
+                  {project.ProjectShowStatus ? project.nameOfProject : ""}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className="mb-3">
-          <label className="form-label">GitHub Code Link</label>
-          <input
-            type="url"
-            name="githubCodeLink"
-            value={formData.githubCodeLink}
-            onChange={handleChange}
-            className="form-control"
-            placeholder="https://github.com/your-repo"
-            required
-          />
-        </div>
+          <div className="mb-3">
+            <label className="form-label">GitHub Code Link</label>
+            <input
+              type="url"
+              name="githubCodeLink"
+              value={formData.githubCodeLink}
+              onChange={handleChange}
+              className="form-control"
+              placeholder="https://github.com/your-repo"
+              required
+            />
+          </div>
 
-        <div className="mb-3">
-          <label className="form-label">Deployed Link</label>
-          <input
-            type="url"
-            name="deployedLink"
-            value={formData.deployedLink}
-            onChange={handleChange}
-            className="form-control"
-            placeholder="https://your-project-link.com"
-            required
-          />
-        </div>
+          <div className="mb-3">
+            <label className="form-label">Deployed Link</label>
+            <input
+              type="url"
+              name="deployedLink"
+              value={formData.deployedLink}
+              onChange={handleChange}
+              className="form-control"
+              placeholder="https://your-project-link.com"
+              required
+            />
+          </div>
 
- 
+          <button type="submit" className="btn btn-primary w-100">
+            Submit Project
+          </button>
+        </form>
+      </div>
 
-        {/* <div className="mb-3">
-          <label className="form-label">Reviewer's Comment</label>
-          <textarea
-            name="ReviewersComment"
-            value={formData.ReviewersComment}
-            onChange={handleChange}
-            className="form-control"
-            rows="3"
-            placeholder="Optional comments from your reviewer..."
-          ></textarea>
-        </div> */}
+      <div className="text-underline container mx-auto row m-4">
+        <hr />
+        <h4 className="text-center">Submitted projects</h4>
 
-        <button type="submit" className="btn btn-primary w-100">
-          Submit Project
-        </button>
-      </form>
-    </div>
+        {(!submittedProjects || submittedProjects.length === 0) ? (
+  <h4>No project submitted so far <PiSmileySadThin /> </h4> 
+) : (
+  <Paper sx={{ height: "90%", width: "95%", margin: "2%" }}>
+    <DataGrid
+      rows={submittedProjects.map((project, index) => ({
+        id: index,
+        submittedProjectName: project.submittedProjectName,
+        githubCodeLink: project.githubCodeLink,
+        deployedLink: project.deployedLink,
+        ReviewersComment: project.ReviewersComment,
+        // projectSumbmitted:project.createdAt,
+        // projectUpdated:project.updatedAt,
+        // projectDeadLine:
+      }))}
+      columns={columns}
+      initialState={{ pagination: { paginationModel } }}
+      pageSizeOptions={[5, 10]}
+      checkboxSelection={false}
+      sx={{ border: 2 }}
+    />
+  </Paper>
+)}
 
-    <div className="text-underline container mx-auto row m-4">
-        <h4>Submitted projects</h4>
-    </div>
-     </>
+</div>
+
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+    </>
   );
 }
 

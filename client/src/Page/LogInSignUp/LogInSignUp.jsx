@@ -1,86 +1,138 @@
 import { useState, useEffect } from "react";
 import "./LogInSignUp.css";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { Link, useNavigate } from "react-router-dom";
+import {useNavigate} from 'react-router-dom'
 import { axiosInstance } from "../../utility/axiosInstance";
-import useSignIn from 'react-auth-kit/hooks/useSignIn'
-import {jwtDecode} from 'jwt-decode'
-function LogInSignUp({errorStatus}) {
+import useSignIn from "react-auth-kit/hooks/useSignIn";
+import { jwtDecode } from "jwt-decode";
+
+function LogInSignUp({ errorStatus }) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [questions, setQuestions] = useState([]);
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(null);
 
   const navigate = useNavigate();
-  const signIn = useSignIn()
+  const signIn = useSignIn();
 
   useEffect(() => {
-    if(errorStatus==='SIGN IN TO YOUR ACCOUNT'){
-      setError(false); 
-    } else if(errorStatus==='CREATE A NEW ACCOUNT'){
-      setError(false); 
+    if (
+      errorStatus === "SIGN IN TO YOUR ACCOUNT" ||
+      errorStatus === "CREATE A NEW ACCOUNT"
+    ) {
+      setError(false);
     }
-
   }, [errorStatus]);
-  // Form states
+
   const [signupData, setSignupData] = useState({
-    userName: "",
-    email: "",
+    userFirstName: "",
+    userLastName: "",
+    userEmail: "",
+    userPhoneNumber: "",
+    Group: "",
+    Batch: "",
+    Year: "",
     password: "",
-    sq1: "",
-    sqa1: "",
   });
 
   const [loginData, setLoginData] = useState({
-    email: "",
+    userEmail: "",
     password: "",
   });
 
-  // Fetch all security questions on component mount
-  useEffect(() => {
-    getAllQuestions();
-  }, []);
-
-  const getAllQuestions = async () => {
-    try {
-      const res = await axiosInstance.get("/users/getSecurityQuestions");
-      setQuestions(res?.data?.allQuestions || []);
-    } catch (err) {
-      setError(err?.response?.data?.errors || "Failed to fetch questions.");
-    }
-  };
-
-  // Handle signup form change
   const handleSignupChange = (e) => {
     setSignupData({ ...signupData, [e.target.name]: e.target.value });
   };
 
-  // Handle login form change
   const handleLoginChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
   };
 
-  // Signup function
   const handleSignup = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
     setSuccess(null);
-
+  
+    const nameRegex = /^[A-Za-z]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^\+\d{6,15}$/;
+  
+    if (!nameRegex.test(signupData.userFirstName) || signupData.userFirstName.length > 15) {
+      setError("First name should contain only letters and not exceed 15 characters.");
+      return;
+    }
+  
+    if (!nameRegex.test(signupData.userLastName) || signupData.userLastName.length > 15) {
+      setError("Last name should contain only letters and not exceed 15 characters.");
+      return;
+    }
+  
+    if (!emailRegex.test(signupData.userEmail)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+  
+    if (!phoneRegex.test(signupData.userPhoneNumber)) {
+      setError("Phone number must start with a country code '+1345... or +251..");
+      return;
+    }
+  
+    if (signupData.password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+  
+    setLoading(true);
+  
     try {
       const res = await axiosInstance.post("/users/createUser", signupData);
-      setSuccess(res?.data?.message);
-      setSignupData({ userName: "", email: "", password: "", sq1: "", sqa1: "" });
+      // setSuccess(res?.data?.message);
+      setSignupData({
+        userFirstName: "",
+        userLastName: "",
+        userEmail: "",
+        userPhoneNumber: "",
+        Group: "",
+        Batch: "",
+        Year: "",
+        password: "",
+      });
+  
+      const token = res.headers["authorization"]?.split(" ")[1];
+      const decodedToken = jwtDecode(token);
+
+      if (token) {
+        if (
+          signIn({
+            auth: {
+              token,
+              type: "Bearer",
+              expiresIn: 4320,
+            },
+            userState: {
+              userId: decodedToken.userId,
+              userEmail: decodedToken.userEmail,
+              userName: decodedToken.userFirstName,
+              role: decodedToken.role,
+              authStatus: true
+            },
+          })
+        ) {
+          navigate("/submitdb");
+        } else {
+          navigate("/signUp");
+        }
+      }
     } catch (err) {
-      console.log(err)
-      setError(err?.response?.data?.errors || "Something went wrong, please try again");
+      setError(
+        err?.response?.data?.errors || "Signup failed, please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
+  
 
-  // Login function
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -89,29 +141,31 @@ function LogInSignUp({errorStatus}) {
 
     try {
       const res = await axiosInstance.post("/users/login", loginData);
-      console.log(res)
-      const token = res.headers['authorization']?.split(' ')[1]
-     const decodedToken = jwtDecode(token)
-     if (token) {
-      if (signIn({
-        auth: {
-          token,
-          type: 'Bearer',
-          expiresIn: 4320,    
-        },
-        userState: {
-          userNameId: decodedToken.userNameId,
-          userName: decodedToken.userName,
-          userRole: decodedToken.role,
-          email:decodedToken.email
-        },
-      })) {
-        navigate("/main");
-      } else {
-        navigate('/signUp');
-      }
-    }
+      const token = res.headers["authorization"]?.split(" ")[1];
+      const decodedToken = jwtDecode(token);
 
+      if (token) {
+        if (
+          signIn({
+            auth: {
+              token,
+              type: "Bearer",
+              expiresIn: 4320,
+            },
+            userState: {
+              userId: decodedToken.userId,
+              userEmail: decodedToken.userEmail,
+              userName: decodedToken.userFirstName,
+              role: decodedToken.role,
+              authStatus: true
+            },
+          })
+        ) {
+          navigate("/submitdb");
+        } else {
+          navigate("/signUp");
+        }
+      }
     } catch (err) {
       setError(err?.response?.data?.message || "Invalid email or password");
     } finally {
@@ -133,7 +187,7 @@ function LogInSignUp({errorStatus}) {
                   className="spn-signupIn"
                   type="button"
                   data-bs-target="#carouselExample"
-                  data-bs-slide="prev"
+                  data-bs-slide="next"
                 >
                   Create a new account
                 </span>
@@ -146,9 +200,9 @@ function LogInSignUp({errorStatus}) {
                 <div className="form-input">
                   <input
                     type="email"
-                    name="email"
+                    name="userEmail"
                     placeholder="Email address"
-                    value={loginData.email}
+                    value={loginData.userEmail}
                     onChange={handleLoginChange}
                     required
                   />
@@ -163,11 +217,12 @@ function LogInSignUp({errorStatus}) {
                     required
                   />
                   <span onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
+                    {showPassword ? (
+                      <AiOutlineEye />
+                    ) : (
+                      <AiOutlineEyeInvisible />
+                    )}
                   </span>
-                </div>
-                <div className="forgot">
-                  <Link to="/forgotPassword">Forgot password?</Link>
                 </div>
                 <div className="btn-login">
                   <button disabled={loading} type="submit">
@@ -188,9 +243,9 @@ function LogInSignUp({errorStatus}) {
                   className="spn-signupIn"
                   type="button"
                   data-bs-target="#carouselExample"
-                  data-bs-slide="next"
+                  data-bs-slide="prev"
                 >
-                  Sign in
+                  Sign In
                 </span>
               </div>
 
@@ -198,53 +253,104 @@ function LogInSignUp({errorStatus}) {
               {success && <p className="success-message">{success}</p>}
 
               <form onSubmit={handleSignup}>
-                <div className="form-input">
-                  <input
-                    name="userName"
-                    type="text"
-                    placeholder="User Name"
-                    value={signupData.userName}
-                    onChange={handleSignupChange}
-                    required
-                  />
-                </div>
-                <div className="form-input">
-                  <input
-                    name="email"
-                    type="email"
-                    placeholder="Email address"
-                    value={signupData.email}
-                    onChange={handleSignupChange}
-                    required
-                  />
-                </div>
                 <div className="row">
                   <div className="form-input col-md-6">
-                    <select
-                      name="sq1"
-                      value={signupData.sq1}
+                    <input
+                      name="userFirstName"
+                      type="text"
+                      placeholder="First Name"
+                      value={signupData.userFirstName}
                       onChange={handleSignupChange}
                       required
-                    >
-                      <option value="">Select security question</option>
-                      {questions?.map((q) => (
-                        <option key={q.UserSecurityQuestionId} value={q.UserSecurityQuestion}>
-                          {q.UserSecurityQuestion}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   </div>
                   <div className="form-input col-md-6">
                     <input
-                      name="sqa1"
+                      name="userLastName"
                       type="text"
-                      placeholder="Answer for security question"
-                      value={signupData.sqa1}
+                      placeholder="Last Name"
+                      value={signupData.userLastName}
                       onChange={handleSignupChange}
                       required
                     />
                   </div>
                 </div>
+
+                <div className="form-input">
+                  <input
+                    name="userEmail"
+                    type="email"
+                    placeholder="Email address"
+                    value={signupData.userEmail}
+                    onChange={handleSignupChange}
+                    required
+                  />
+                </div>
+
+                <div className="row">
+                  <div className="form-input col-md-6">
+                    <select
+                      name="Group"
+                      value={signupData.Group}
+                      onChange={handleSignupChange}
+                      required
+                    >
+                      <option value="" disabled>Select Group</option>
+                      <option value="Group 1">Group 1</option>
+                      <option value="Group 2">Group 2</option>
+                      <option value="Group 3">Group 3</option>
+                      <option value="Group 4">Group 4</option>
+                    </select>
+                  </div>
+                  <div className="form-input col-md-6">
+                    <select
+                      name="Batch"
+                      value={signupData.Batch}
+                      onChange={handleSignupChange}
+                      required
+                    >
+                      <option value="" disabled>Select Batch (Month)</option>
+                      <option value="January">January</option>
+                      <option value="February">February</option>
+                      <option value="March">March</option>
+                      <option value="April">April</option>
+                      <option value="May">May</option>
+                      <option value="June">June</option>
+                      <option value="July">July</option>
+                      <option value="August">August</option>
+                      <option value="September">September</option>
+                      <option value="October">October</option>
+                      <option value="November">November</option>
+                      <option value="December">December</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="row">
+                  <div className="form-input col-md-6">
+                    <input
+                      name="Year"
+                      type="number"
+                      placeholder="Year"
+                      value={signupData.Year}
+                      onChange={handleSignupChange}
+                      min="2000"
+                      max={new Date().getFullYear() + 1}
+                      required
+                    />
+                  </div>
+                  <div className="form-input col-md-6">
+                    <input
+                      name="userPhoneNumber"
+                      type="text"
+                      placeholder="Phone Number"
+                      value={signupData.userPhoneNumber}
+                      onChange={handleSignupChange}
+                      required
+                    />
+                  </div>
+                </div>
+
                 <div className="form-input password">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -255,9 +361,14 @@ function LogInSignUp({errorStatus}) {
                     required
                   />
                   <span onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
+                    {showPassword ? (
+                      <AiOutlineEye />
+                    ) : (
+                      <AiOutlineEyeInvisible />
+                    )}
                   </span>
                 </div>
+
                 <div className="btn-login">
                   <button disabled={loading} type="submit">
                     {loading ? "Signing up..." : "Create account"}

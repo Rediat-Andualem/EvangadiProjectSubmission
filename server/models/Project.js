@@ -17,6 +17,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true, 
       },
+      ProjectShowStatus: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true, 
+        defaultValue : true
+      },
       ProjectDeadLine: {
         type: DataTypes.STRING,
         allowNull: true, 
@@ -30,7 +35,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'userId',
         onDelete: 'CASCADE',
       });
+    
+      Project.hasMany(models.ProjectSubmission, {
+        foreignKey: 'submittedProjectName',
+        onDelete: 'CASCADE',
+      });
     };
+    
+    
   
     return Project;
   };

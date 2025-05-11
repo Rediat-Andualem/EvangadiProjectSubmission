@@ -1,13 +1,10 @@
-import { useState } from 'react'
 import './App.css'
-import LandingPage from './Page/LandingPage/Dashboard'
-import ProjectSubmissionPage from './Page/ProjectPage/ProjectSubmissionPage'
+import Routing from '../Router.jsx'
 function App() {
  
   return (
     <>
-     {/* <LandingPage/> */}
-     <ProjectSubmissionPage/>
+      <Routing/>
     </>
   )
 }
