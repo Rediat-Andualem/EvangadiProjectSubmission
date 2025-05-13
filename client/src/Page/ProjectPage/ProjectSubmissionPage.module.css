@@ -22,3 +22,10 @@
     margin: 0 auto;
 }
 
+.forBold {
+  font-weight: bold;
+}
+
+.forItalic {
+  font-style: italic;
+}

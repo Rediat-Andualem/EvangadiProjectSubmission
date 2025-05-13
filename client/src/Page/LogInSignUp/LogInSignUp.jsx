@@ -124,6 +124,7 @@ function LogInSignUp({ errorStatus }) {
         }
       }
     } catch (err) {
+      console.log(err)
       setError(
         err?.response?.data?.errors || "Signup failed, please try again."
       );

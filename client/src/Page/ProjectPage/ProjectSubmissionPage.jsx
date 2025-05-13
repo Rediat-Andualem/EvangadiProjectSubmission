@@ -8,13 +8,14 @@ import { axiosInstance } from "../../utility/axiosInstance";
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { PiSmileySadThin } from "react-icons/pi"; 
-    import dayjs from 'dayjs';
+import { PiSmileySadThin } from "react-icons/pi";
+import dayjs from "dayjs";
 //  for table view
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import Button from "react-bootstrap/Button";
-
+import customParseFormat from "dayjs/plugin/customParseFormat";
+dayjs.extend(customParseFormat);
 function ProjectSubmissionPage() {
   const [formData, setFormData] = useState({
     submittedProjectName: "",
@@ -70,7 +71,11 @@ function ProjectSubmissionPage() {
       getSubmittedProjects();
     } catch (error) {
       console.log(error);
-      toast.error(error?.response.data? error.response.data.message : "Something went wrong. Please try again.");
+      toast.error(
+        error?.response.data
+          ? error.response.data.message
+          : "Something went wrong. Please try again."
+      );
     }
   };
 
@@ -85,14 +90,11 @@ function ProjectSubmissionPage() {
           },
         }
       );
-      setSubmittedProjects(getSubmittedProjects.data );
+      setSubmittedProjects(getSubmittedProjects.data);
     } catch (error) {
       console.log(error);
     }
   };
-
-
-console.log(submittedProjects)
 
   //  list of project name and picture at the top
   const projects = [
@@ -103,8 +105,11 @@ console.log(submittedProjects)
   ];
   //  table columns
   const columns = [
-
-    { field: "submittedProjectName", headerName: "Submitted Project Name", width: 180 },
+    {
+      field: "submittedProjectName",
+      headerName: "Submitted Project Name",
+      width: 180,
+    },
     { field: "githubCodeLink", headerName: "Github Link", width: 250 },
     { field: "deployedLink", headerName: "Deployed Link", width: 250 },
     { field: "ReviewersComment", headerName: "Reviewers Comment", width: 300 },
@@ -131,7 +136,6 @@ console.log(submittedProjects)
   ];
 
   const paginationModel = { page: 0, pageSize: 3 };
-
 
   return (
     <>
@@ -175,7 +179,14 @@ console.log(submittedProjects)
               </option>
               {projectCollection?.map((project, index) => (
                 <option key={index} value={project.projectId}>
-                  {project.ProjectShowStatus ? project.nameOfProject : ""}
+                  {/* {project.ProjectShowStatus ? (`Project name ${<b>${project.nameOfProject} </b>}, Project deadline :  ${project.ProjectDeadLine}` ): ""} */}
+
+                  {project.ProjectShowStatus ? (
+                    <>
+                      <p className={styles.forBold}>Project name : </p> <p className={styles.forItalic}>{project.nameOfProject}</p>, <p>Submission deadline:</p>
+                       <p>{project.ProjectDeadLine}</p>
+                    </>
+                  ) : null}
                 </option>
               ))}
             </select>
@@ -217,72 +228,96 @@ console.log(submittedProjects)
         <hr />
         <h4 className="text-center">Submitted projects</h4>
 
-        {(!submittedProjects || submittedProjects.length === 0) ? (
-  <h4>No project submitted so far <PiSmileySadThin /> </h4> 
-) : (
-  <Paper sx={{ height: "90%", width: "100%", margin: "2%" }}>
+        {!submittedProjects || submittedProjects.length === 0 ? (
+          <h4>
+            No project submitted so far <PiSmileySadThin />{" "}
+          </h4>
+        ) : (
+          <Paper sx={{ height: "90%", width: "100%", margin: "2%" }}>
+            <DataGrid
+              rows={submittedProjects?.map((project, index) => {
+                const createdAtFormatted = dayjs(project.createdAt).format(
+                  "DD/MM/YYYY"
+                );
 
-<DataGrid
-rows={submittedProjects?.map((project, index) => {
-  // Parse both using the same known format
-  const createdAt = dayjs(project.createdAt, "DD/MM/YYYY").startOf("day");
-  const deadline = dayjs(project.ProjectDeadLine, "DD/MM/YYYY").startOf("day");
+                const createdAt = dayjs(createdAtFormatted, "DD/MM/YYYY");
+                const deadline = dayjs(project.ProjectDeadLine, "DD/MM/YYYY");
 
-  const submittedOnTime = createdAt.isSame(deadline) || createdAt.isBefore(deadline);
-  console.log(createdAt.isBefore(deadline))
-  return {
-    id: index,
-    submittedProjectName: project.nameOfProject,
-    githubCodeLink: project.githubCodeLink,
-    deployedLink: project.deployedLink,
-    ReviewersComment: project.ReviewersComment,
-    projectSubmitted: createdAt.format("DD/MM/YYYY"),
-    projectDeadLine: project.ProjectDeadLine,
-    submissionStatus: submittedOnTime ? "Submitted on time" : "Not submitted on time",
-    submissionStatusColor: submittedOnTime ? "green" : "red",
-  };
-})}
-  columns={[
-    { field: "submittedProjectName", headerName: "Project Name", width: 200 },
-    { field: "githubCodeLink", headerName: "GitHub Link", width: 200 },
-    { field: "deployedLink", headerName: "Live Site", width: 200 },
-    { field: "ReviewersComment", headerName: "Instructor Comment", width: 200 },
-    { field: "projectSubmitted", headerName: "Submitted Date", width: 130 },
-    { field: "projectDeadLine", headerName: "Deadline", width: 130 },
-    {
-      field: "submissionStatus",
-      headerName: "Status",
-      width: 180,
-      renderCell: (params) => (
-        <div
-          style={{
-            backgroundColor: params.row.submissionStatusColor,
-            color: "white",
-            padding: "5px 10px",
-            borderRadius: "4px",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          {params.row.submissionStatus}
-        </div>
-      ),
-    },
-  ]}
-  initialState={{ pagination: { paginationModel } }}
-  pageSizeOptions={[5, 10]}
-  checkboxSelection={false}
-  sx={{ border: 2 }}
-/>
+                console.log("Created At:", createdAt.format("DD/MM/YYYY"));
+                console.log("Deadline:", deadline.format("DD/MM/YYYY"));
 
+                const submittedOnTime =
+                  createdAt.isSame(deadline) || createdAt.isBefore(deadline);
 
-
-
-
-  </Paper>
-)}
-
-</div>
+                return {
+                  id: index,
+                  submittedProjectName: project.nameOfProject,
+                  githubCodeLink: project.githubCodeLink,
+                  deployedLink: project.deployedLink,
+                  ReviewersComment: project.ReviewersComment,
+                  projectSubmitted: createdAtFormatted,
+                  projectDeadLine: project.ProjectDeadLine,
+                  submissionStatus: submittedOnTime
+                    ? "Submitted on time"
+                    : "Not submitted on time",
+                  submissionStatusColor: submittedOnTime ? "green" : "red",
+                };
+              })}
+              columns={[
+                {
+                  field: "submittedProjectName",
+                  headerName: "Project Name",
+                  width: 200,
+                },
+                {
+                  field: "githubCodeLink",
+                  headerName: "GitHub Link",
+                  width: 200,
+                },
+                { field: "deployedLink", headerName: "Live Site", width: 200 },
+                {
+                  field: "ReviewersComment",
+                  headerName: "Instructor Comment",
+                  width: 200,
+                },
+                {
+                  field: "projectSubmitted",
+                  headerName: "Submitted Date",
+                  width: 130,
+                },
+                {
+                  field: "projectDeadLine",
+                  headerName: "Deadline",
+                  width: 130,
+                },
+                {
+                  field: "submissionStatus",
+                  headerName: "Status",
+                  width: 180,
+                  renderCell: (params) => (
+                    <div
+                      style={{
+                        backgroundColor: params.row.submissionStatusColor,
+                        color: "white",
+                        padding: "5px 10px",
+                        borderRadius: "4px",
+                        textAlign: "center",
+                        width: "100%",
+                      }}
+                    >
+                      {params.row.submissionStatus}
+                    </div>
+                  ),
+                },
+              ]}
+              initialState={{ pagination: { paginationModel } }}
+              pageSizeOptions={[5, 10]}
+              checkboxSelection={false}
+              sx={{ border: 2 }}
+            />
+          </Paper>
+        )}
+      </div>
 
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </>
