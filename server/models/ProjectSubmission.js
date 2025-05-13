@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    submittedProjectName: {
+    projectId: {  
       type: DataTypes.UUID,
       allowNull: false,
       references: {
@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     deployedLink: {
       type: DataTypes.STRING,
-      allowNull: true, 
+      allowNull: true,
     },
     projectType: {
       type: DataTypes.STRING,
@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
     ProjectUpdateStatus: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
-      defaultValue:true 
+      defaultValue: true,
     },
     ReviewersComment: {
       type: DataTypes.STRING,
@@ -44,13 +44,12 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'userId',
       onDelete: 'CASCADE',
     });
-    
+
     ProjectSubmission.belongsTo(models.Project, {
-      foreignKey: 'projectId', 
+      foreignKey: 'projectId',
       onDelete: 'CASCADE',
     });
   };
-  
 
   return ProjectSubmission;
 };

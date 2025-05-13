@@ -9,7 +9,7 @@ import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { PiSmileySadThin } from "react-icons/pi"; 
-
+    import dayjs from 'dayjs';
 //  for table view
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
@@ -108,6 +108,9 @@ console.log(submittedProjects)
     { field: "githubCodeLink", headerName: "Github Link", width: 250 },
     { field: "deployedLink", headerName: "Deployed Link", width: 250 },
     { field: "ReviewersComment", headerName: "Reviewers Comment", width: 300 },
+    { field: "projectSumbmitted", headerName: "Submitted Date", width: 300 },
+    { field: "projectUpdated", headerName: "Updated Date", width: 300 },
+    { field: "projectDeadLine", headerName: "Project Deadline", width: 300 },
     {
       field: "action",
       headerName: "Action",
@@ -126,8 +129,9 @@ console.log(submittedProjects)
       width: 150,
     },
   ];
-console.log(formData)
-  const paginationModel = { page: 0, pageSize: 10 };
+
+  const paginationModel = { page: 0, pageSize: 3 };
+
 
   return (
     <>
@@ -216,24 +220,65 @@ console.log(formData)
         {(!submittedProjects || submittedProjects.length === 0) ? (
   <h4>No project submitted so far <PiSmileySadThin /> </h4> 
 ) : (
-  <Paper sx={{ height: "90%", width: "95%", margin: "2%" }}>
-    <DataGrid
-      rows={submittedProjects.map((project, index) => ({
-        id: index,
-        submittedProjectName: project.submittedProjectName,
-        githubCodeLink: project.githubCodeLink,
-        deployedLink: project.deployedLink,
-        ReviewersComment: project.ReviewersComment,
-        // projectSumbmitted:project.createdAt,
-        // projectUpdated:project.updatedAt,
-        // projectDeadLine:
-      }))}
-      columns={columns}
-      initialState={{ pagination: { paginationModel } }}
-      pageSizeOptions={[5, 10]}
-      checkboxSelection={false}
-      sx={{ border: 2 }}
-    />
+  <Paper sx={{ height: "90%", width: "100%", margin: "2%" }}>
+
+<DataGrid
+rows={submittedProjects?.map((project, index) => {
+  // Parse both using the same known format
+  const createdAt = dayjs(project.createdAt, "DD/MM/YYYY").startOf("day");
+  const deadline = dayjs(project.ProjectDeadLine, "DD/MM/YYYY").startOf("day");
+
+  const submittedOnTime = createdAt.isSame(deadline) || createdAt.isBefore(deadline);
+  console.log(createdAt.isBefore(deadline))
+  return {
+    id: index,
+    submittedProjectName: project.nameOfProject,
+    githubCodeLink: project.githubCodeLink,
+    deployedLink: project.deployedLink,
+    ReviewersComment: project.ReviewersComment,
+    projectSubmitted: createdAt.format("DD/MM/YYYY"),
+    projectDeadLine: project.ProjectDeadLine,
+    submissionStatus: submittedOnTime ? "Submitted on time" : "Not submitted on time",
+    submissionStatusColor: submittedOnTime ? "green" : "red",
+  };
+})}
+  columns={[
+    { field: "submittedProjectName", headerName: "Project Name", width: 200 },
+    { field: "githubCodeLink", headerName: "GitHub Link", width: 200 },
+    { field: "deployedLink", headerName: "Live Site", width: 200 },
+    { field: "ReviewersComment", headerName: "Instructor Comment", width: 200 },
+    { field: "projectSubmitted", headerName: "Submitted Date", width: 130 },
+    { field: "projectDeadLine", headerName: "Deadline", width: 130 },
+    {
+      field: "submissionStatus",
+      headerName: "Status",
+      width: 180,
+      renderCell: (params) => (
+        <div
+          style={{
+            backgroundColor: params.row.submissionStatusColor,
+            color: "white",
+            padding: "5px 10px",
+            borderRadius: "4px",
+            textAlign: "center",
+            width: "100%",
+          }}
+        >
+          {params.row.submissionStatus}
+        </div>
+      ),
+    },
+  ]}
+  initialState={{ pagination: { paginationModel } }}
+  pageSizeOptions={[5, 10]}
+  checkboxSelection={false}
+  sx={{ border: 2 }}
+/>
+
+
+
+
+
   </Paper>
 )}
 

@@ -25,7 +25,7 @@ const {userId} =req.user
     }
 
     const newProject = await ProjectSubmission.create({
-      submittedProjectName,
+      projectId:submittedProjectName,
       githubCodeLink,
       deployedLink,
       projectType,
@@ -41,31 +41,36 @@ const {userId} =req.user
 };
 
 const getProjectByStudent = async (req, res) => {
-  const { userId } = req.user; 
+  const { userId } = req.user;
 
   if (!userId) {
     return res.status(400).json({ message: "User ID is required." });
   }
 
   try {
-    const projects = await ProjectSubmission.findAll({
+    const submissions = await ProjectSubmission.findAll({
       where: { userId },
       order: [['createdAt', 'DESC']],
       include: [
         {
           model: Project,
-          attributes: ['ProjectDeadLine','nameOfProject'], 
-          required: true, 
-        },
-      ],
+          attributes: ['ProjectDeadLine', 'nameOfProject'],
+          required: true
+        }
+      ]
     });
-    console.log("6",projects)
-    if (projects.length === 0) {
-      return res.status(200).json([]);
-    }
 
-    // Returning the projects with the joined ProjectDeadLine
-    return res.status(200).json(projects);
+    // Flatten the data
+    const formatted = submissions.map(submission => {
+      const { Project: project, ...submissionData } = submission.toJSON();
+      return {
+        ...submissionData,
+        nameOfProject: project?.nameOfProject,
+        ProjectDeadLine: project?.ProjectDeadLine
+      };
+    });
+
+    return res.status(200).json(formatted);
   } catch (error) {
     console.error("Error fetching student projects:", error.message);
     return res.status(500).json({ message: "Internal server error", error: error.message });
