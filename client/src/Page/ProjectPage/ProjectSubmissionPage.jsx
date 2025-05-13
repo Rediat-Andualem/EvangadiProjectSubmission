@@ -66,7 +66,6 @@ function ProjectSubmissionPage() {
           },
         }
       );
-      console.log(submitProject.data);
       toast.success("Project submitted successfully! 🎉");
       getSubmittedProjects();
     } catch (error) {
@@ -78,6 +77,23 @@ function ProjectSubmissionPage() {
       );
     }
   };
+
+  let deletePostedProject = async (projectId) => {
+    console.log(projectId)
+    try {
+      await axiosInstance.delete(`/projectCreation/deleteProjectForStudents/${projectId}`, { 
+        headers: {
+          Authorization: authHeader,
+        },
+      }); 
+     
+      getSubmittedProjects();
+    } catch (error) {
+      console.error("Error deleting answer:", error);
+    }
+  };
+
+
 
   // get submitted projects
   const getSubmittedProjects = async () => {
@@ -123,7 +139,7 @@ function ProjectSubmissionPage() {
         <>
           <Button
             style={{ margin: "5px" }}
-            onClick={() => deleteUser(params?.row.userId, params?.row.role)}
+            onClick={() => deletePostedProject(params)}
             variant="danger"
           >
             Delete
