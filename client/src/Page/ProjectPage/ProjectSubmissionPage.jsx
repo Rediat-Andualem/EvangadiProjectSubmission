@@ -79,9 +79,9 @@ function ProjectSubmissionPage() {
   };
 
   let deletePostedProject = async (projectId) => {
-    console.log(projectId)
+
     try {
-      await axiosInstance.delete(`/projectCreation/deleteProjectForStudents/${projectId}`, { 
+      await axiosInstance.delete(`/projectSubmission/deleteProject/${projectId}`, {     
         headers: {
           Authorization: authHeader,
         },
@@ -93,13 +93,13 @@ function ProjectSubmissionPage() {
     }
   };
 
-
+// projectSubmission/deleteProject/:projectId
 
   // get submitted projects
   const getSubmittedProjects = async () => {
     try {
       let getSubmittedProjects = await axiosInstance.get(
-        "/projectSubmission/getStudentProject",
+        "/projectSubmission/getStudentProject",  
         {
           headers: {
             Authorization: authHeader,
@@ -118,37 +118,6 @@ function ProjectSubmissionPage() {
     { name: "Amazon", img: amazon },
     { name: "Evangadi Forum", img: forum },
     { name: "Portfolio Website", img: portfolio },
-  ];
-  //  table columns
-  const columns = [
-    {
-      field: "submittedProjectName",
-      headerName: "Submitted Project Name",
-      width: 180,
-    },
-    { field: "githubCodeLink", headerName: "Github Link", width: 250 },
-    { field: "deployedLink", headerName: "Deployed Link", width: 250 },
-    { field: "ReviewersComment", headerName: "Reviewers Comment", width: 300 },
-    { field: "projectSumbmitted", headerName: "Submitted Date", width: 300 },
-    { field: "projectUpdated", headerName: "Updated Date", width: 300 },
-    { field: "projectDeadLine", headerName: "Project Deadline", width: 300 },
-    {
-      field: "action",
-      headerName: "Action",
-      renderCell: (params) => (
-        <>
-          <Button
-            style={{ margin: "5px" }}
-            onClick={() => deletePostedProject(params)}
-            variant="danger"
-          >
-            Delete
-          </Button>
-          <ToastContainer />
-        </>
-      ),
-      width: 150,
-    },
   ];
 
   const paginationModel = { page: 0, pageSize: 3 };
@@ -259,8 +228,7 @@ function ProjectSubmissionPage() {
                 const createdAt = dayjs(createdAtFormatted, "DD/MM/YYYY");
                 const deadline = dayjs(project.ProjectDeadLine, "DD/MM/YYYY");
 
-                console.log("Created At:", createdAt.format("DD/MM/YYYY"));
-                console.log("Deadline:", deadline.format("DD/MM/YYYY"));
+            
 
                 const submittedOnTime =
                   createdAt.isSame(deadline) || createdAt.isBefore(deadline);
@@ -277,13 +245,15 @@ function ProjectSubmissionPage() {
                     ? "Submitted on time"
                     : "Not submitted on time",
                   submissionStatusColor: submittedOnTime ? "green" : "red",
+                  projectActualId : project.submittedProjectId,
+                  deleteStatus: project.ProjectUpdateStatus
                 };
               })}
               columns={[
                 {
                   field: "submittedProjectName",
                   headerName: "Project Name",
-                  width: 200,
+                  width: 140,
                 },
                 {
                   field: "githubCodeLink",
@@ -299,17 +269,17 @@ function ProjectSubmissionPage() {
                 {
                   field: "projectSubmitted",
                   headerName: "Submitted Date",
-                  width: 130,
+                  width: 120,
                 },
                 {
                   field: "projectDeadLine",
                   headerName: "Deadline",
-                  width: 130,
+                  width: 100,
                 },
                 {
                   field: "submissionStatus",
                   headerName: "Status",
-                  width: 180,
+                  width: 175,
                   renderCell: (params) => (
                     <div
                       style={{
@@ -324,6 +294,26 @@ function ProjectSubmissionPage() {
                       {params.row.submissionStatus}
                     </div>
                   ),
+                },
+                {
+                  field: "action",
+                  headerName: "Action",
+                  renderCell: (params) => (
+               
+                    
+                      params.row.deleteStatus?(<> <Button
+                        style={{ margin: "5px" }}
+                        onClick={() => deletePostedProject(params.row.projectActualId)}
+                        variant="danger"
+                      >
+                        Delete
+                      </Button>   <ToastContainer /></>) :("you can't update")
+                    
+                      
+                    
+                  
+                  ),
+                  width: 150,
                 },
               ]}
               initialState={{ pagination: { paginationModel } }}
