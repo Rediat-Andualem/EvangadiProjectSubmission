@@ -67,10 +67,9 @@ const getProjectByStudent = async (req, res) => {
         ...submissionData,
         nameOfProject: project?.nameOfProject,
         ProjectDeadLine: project?.ProjectDeadLine,
-        // projectActualId: submissions?.submittedProjectId
       };
     });
-console.log(formatted)
+
     return res.status(200).json(formatted);
   } catch (error) {
     console.error("Error fetching student projects:", error.message);

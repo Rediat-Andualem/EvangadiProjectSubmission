@@ -307,7 +307,7 @@ function ProjectSubmissionPage() {
                         variant="danger"
                       >
                         Delete
-                      </Button>   <ToastContainer /></>) :("you can't update")
+                      </Button></>) :("you can't update")
                     
                       
                     
