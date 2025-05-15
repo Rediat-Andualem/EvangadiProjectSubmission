@@ -7,7 +7,7 @@ import DashBoard from "./src/Page/LandingPage/Dashboard.jsx";
 import LayOut from "./src/components/LayOut/LayOut.jsx"
 import ProjectSubmissionPage from "./src/Page/ProjectPage/ProjectSubmissionPage.jsx";
 import PrivateRoute from './src/components/ProtectRoute/PrivateRoute.jsx'
-
+import Admin from './src/Page/AdminPage/Main/Main.jsx'
 
 
 function Routing() {
@@ -21,6 +21,7 @@ function Routing() {
     {/* Protected route for authenticated users */}
     <Route element={<PrivateRoute />}>
       <Route path="/submitdb" element={<LayOut showFooter={true} showHeader={true}><ProjectSubmissionPage /></LayOut>} />
+      <Route path="/forAdmin" element={<LayOut showFooter={true} showHeader={true}><Admin /></LayOut>}/>
     </Route>
   </Routes>
   );

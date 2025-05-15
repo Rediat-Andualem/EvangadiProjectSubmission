@@ -31,7 +31,7 @@ function Header() {
   };
 
   const forAdmin = () => {
-    if(auth ){
+    if(auth.role ==='1' ){
       navigate('/forAdmin')
     }else{
       navigate('/signupLogIn')
@@ -64,13 +64,15 @@ function Header() {
           >
             {/* <Nav.Link href="#action1">Home</Nav.Link> */}
             
-          {auth?.userRole==='1'? <Nav.Link onClick={forAdmin} className={`${styles.forTextColor} ${styles.underline}`} > <h5>Admin</h5></Nav.Link> : ""}  
+         
             {/* <Nav.Link onClick={forProfile} className={`${styles.forTextColor} ${styles.underline}`} ><h5>Update profile</h5></Nav.Link> */}
       
           </Nav>
           <Nav.Link onClick={forHome} className={`${styles.forTextColor} ${styles.underline}`} ><h5>Home</h5></Nav.Link>
           <Nav.Link href='https://evangadidomain.com/about'  className={`${styles.forTextColor} ${styles.underline}`} ><h5>About</h5></Nav.Link>
+           {auth?.role==="1"? <Nav.Link onClick={forAdmin} className={`${styles.forTextColor} ${styles.underline}`} > <h5>Admin page</h5></Nav.Link> : ""}  
           <Nav.Link href='https://www.evangadi.com/empower' className={`${styles.forTextColor} ${styles.underline}`} ><h5>How It Work</h5></Nav.Link>
+      
           <h5 className="p-3 ">{auth? `Welcome ${auth.userName}`:""}</h5>
             {auth && <Button onClick={logout}  className={`${styles.forButton}`}  variant="outline-success">
              {auth?`LogOut`:``}

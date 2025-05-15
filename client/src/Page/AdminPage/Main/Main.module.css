@@ -1,0 +1,26 @@
+
+
+  .buttonList {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #f1f1f1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.forButton {
+  width: 100%;
+  font-weight: bold;
+}
+
+.contentArea {
+  flex: 1;
+  padding: 20px;
+  background-color: #fff;
+}

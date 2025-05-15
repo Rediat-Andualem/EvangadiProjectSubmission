@@ -55,7 +55,6 @@ function ProjectSubmissionPage() {
   //  submit projects
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted Project:", formData);
     try {
       let submitProject = await axiosInstance.post(
         "/projectSubmission/submitProject",
