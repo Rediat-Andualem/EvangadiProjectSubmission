@@ -2,7 +2,8 @@ const express = require("express");
 const {
  createProjectForStudents,
  getProjectsCreatedForStudents,
- deleteProjectForStudents
+ deleteProjectForStudents,
+ updateProjectShowStatusForStudents
 } = require("../controllers/Projects");
 const { checkRole, authenticateToken } = require("../Auth/Auth.js");
 
@@ -11,6 +12,7 @@ let ProjectForStudentsRoute = express.Router();
 ProjectForStudentsRoute.post("/createProjectForStudents",authenticateToken, checkRole(['1']), createProjectForStudents);
 ProjectForStudentsRoute.get("/getProjectsForStudents",authenticateToken,getProjectsCreatedForStudents);
 ProjectForStudentsRoute.delete("/deleteProjectForStudents/:projectId",authenticateToken,checkRole(['1']),deleteProjectForStudents);
+ProjectForStudentsRoute.patch("/updateShowStatus/:projectId",authenticateToken,checkRole(['1']),updateProjectShowStatusForStudents);
 
 
 module.exports = { ProjectForStudentsRoute };

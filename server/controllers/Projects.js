@@ -53,8 +53,37 @@ const deleteProjectForStudents = async (req, res) => {
 };
 
 
+const updateProjectShowStatusForStudents = async (req, res) => {
+  const { projectId } = req.params;
+  const { ProjectShowStatus } = req.body;
+
+  try {
+    // Find the project by primary key
+    const project = await Project.findByPk(projectId);
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    // Update only the ProjectShowStatus field
+    project.ProjectShowStatus = ProjectShowStatus;
+
+    // Save changes
+    await project.save();
+
+    return res.status(200).json({
+      message: "ProjectShowStatus updated successfully",
+      project,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   createProjectForStudents,
   getProjectsCreatedForStudents,
-  deleteProjectForStudents
+  deleteProjectForStudents,
+  updateProjectShowStatusForStudents
 };
