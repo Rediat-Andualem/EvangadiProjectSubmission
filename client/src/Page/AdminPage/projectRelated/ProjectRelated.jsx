@@ -113,7 +113,39 @@ function ProjectRelated() {
     }
   };
 
-  console.log(projectCollection);
+ const toggleShowHideProject = async (projectId, currentStatus) => {
+  try {
+
+    await axiosInstance.patch(
+      `/projectCreation/updateShowStatus/${projectId}`,   
+      { ProjectShowStatus: !currentStatus },
+      { headers: { Authorization: authHeader } }
+    );
+    toast.success(`Project is now ${!currentStatus ? "shown" : "hidden"} to students`);
+    getProjects();
+  } catch (error) {
+    toast.error("Failed to update project show status");
+  }
+};
+
+const toggleAllowLinkUpdate = async (projectId, currentStatus) => {
+  try {
+
+    await axiosInstance.patch(
+      `/projectSubmission/updateAllowing/${projectId}`,    
+      { ProjectUpdateStatus: !currentStatus },
+      { headers: { Authorization: authHeader } }
+    );
+    toast.success(`Link updating is now ${!currentStatus ? "allowed" : "prevented"}`);
+    getProjects();
+  } catch (error) {
+    toast.error("Failed to update link update permission");
+  }
+};
+
+
+
+
   const paginationModel = { page: 0, pageSize: 3 };
 
   return (
@@ -203,6 +235,7 @@ function ProjectRelated() {
                   projectResource: project.projectResource,
                   projectDeadLine: project.ProjectDeadLine,
                   ProjectShowStatus: project.ProjectShowStatus,
+                  allowLinkUpdate: project.allowLinkUpdate,
                   projectId: project.projectId,
                 };
               })}
@@ -246,34 +279,34 @@ function ProjectRelated() {
                     </Button>
                   ),
                 },
-                {
-                  field: "showhide",
-                  headerName: "show / hide project for students",
-                  width: 170,
-                  renderCell: (params) => (
-                    <Button
-                      style={{ margin: "5px" }}
-                      onClick={() => deleteProject(params.row.projectId)}
-                      variant="info"
-                    >
-                      Show / Hide
-                    </Button>
-                  ),
-                },
-                {
-                  field: "updateStatus",
-                  headerName: "Allow link updating",
-                  width: 170,
-                  renderCell: (params) => (
-                    <Button
-                      style={{ margin: "5px" }}
-                      onClick={() => deleteProject(params.row.projectId)}
-                      variant="warning"
-                    >
-                     Allow / Prevent
-                    </Button>
-                  ),
-                },
+               {
+  field: "showhide",
+  headerName: "Show / Hide project for students",
+  width: 170,
+  renderCell: (params) => (
+    <Button
+      style={{ margin: "5px" }}
+      onClick={() => toggleShowHideProject(params.row.projectId, params.row.ProjectShowStatus)}
+      variant={params.row.ProjectShowStatus ? "danger" : "success"} // red if shown (means clicking hides), green if hidden (means clicking shows)
+    >
+      {params.row.ProjectShowStatus ? "Hide" : "Show"}
+    </Button>
+  ),
+},
+               {
+  field: "updateStatus",
+  headerName: "Allow link updating",
+  width: 170,
+  renderCell: (params) => (
+    <Button
+      style={{ margin: "5px" }}
+      onClick={() => toggleAllowLinkUpdate(params.row.projectId, params.row.allowLinkUpdate)}
+      variant={params.row.allowLinkUpdate ? "danger" : "success"} // red means currently allowed, button says "Prevent"
+    >
+      {params.row.allowLinkUpdate ? "Prevent" : "Allow"}
+    </Button>
+  ),
+},
               ]}
               initialState={{ pagination: { paginationModel } }}
               pageSizeOptions={[5, 10]}
