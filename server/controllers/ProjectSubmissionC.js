@@ -246,13 +246,12 @@ const commentFromInstructors = async (req, res) => {
 };
 
 const updateAllowing = async (req, res) => {
-  const { submittedProjectId } = req.params;
-  const { ProjectUpdateStatus } = req.body;
-console.log(submittedProjectId,ProjectUpdateStatus)
+  const { projectId } = req.params;
+  const {ProjectUpdateStatus} = req.body
   try {
     const [updatedRowsCount] = await ProjectSubmission.update(
       { ProjectUpdateStatus },
-      { where: { submittedProjectId } }
+      { where: { projectId } }
     );
 
     if (updatedRowsCount === 0) {

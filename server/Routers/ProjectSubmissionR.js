@@ -18,7 +18,7 @@ projectSubmissionRouter.put("/updateStudentProject/:projectId",authenticateToken
 projectSubmissionRouter.delete("/deleteProject/:projectId",authenticateToken,deleteProject);
 projectSubmissionRouter.get("/fullInfo",authenticateToken, checkRole(["1"]),getAllProjectSubmissions);
 projectSubmissionRouter.post("/projectComment/:currentProjectId",authenticateToken, checkRole(["1"]),commentFromInstructors);
-projectSubmissionRouter.patch("/updateAllowing/:submittedProjectId",authenticateToken, checkRole(["1"]),updateAllowing);
+projectSubmissionRouter.patch("/updateAllowing/:projectId",authenticateToken, checkRole(["1"]),updateAllowing);
 
 
 

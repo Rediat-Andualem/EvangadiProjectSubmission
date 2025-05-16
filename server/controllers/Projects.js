@@ -1,4 +1,4 @@
-const { Project } = require('../models');
+const { Project,ProjectSubmission  } = require('../models');
 
 const createProjectForStudents = async (req, res) => {
   const { nameOfProject, projectDescription, projectResource, ProjectDeadLine } = req.body;
@@ -25,13 +25,35 @@ const createProjectForStudents = async (req, res) => {
 
 const getProjectsCreatedForStudents = async (req, res) => {
   try {
-    const projects = await Project.findAll();
-    return res.status(200).json({ projects });
+    const projects = await Project.findAll({
+      include: [
+        {
+          model: ProjectSubmission,
+          attributes: ['submittedProjectId', 'ProjectUpdateStatus'],
+        },
+      ],
+    });
+
+    // Flatten the response
+    const flattenedProjects = projects.map(project => {
+      const plainProject = project.get({ plain: true });
+
+      // Take only the first submission (if any)
+      const submission = plainProject.ProjectSubmissions?.[0] || {};
+
+      // Merge submission fields into project
+      return {
+        ...plainProject,
+        submittedProjectId: submission.submittedProjectId || null,
+        ProjectUpdateStatus: submission.ProjectUpdateStatus ?? null,
+      };
+    });
+
+    return res.status(200).json({ projects: flattenedProjects });
   } catch (error) {
     return res.status(500).json({ message: "Failed to get projects", error: error.message });
   }
 };
-
 
 
 
