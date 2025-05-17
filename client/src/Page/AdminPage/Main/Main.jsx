@@ -4,6 +4,7 @@ import styles from "./Main.module.css";
 import StudentsRelated from "../studentsRelated/StudentRelated";
 import ProjectRelated from "../projectRelated/ProjectRelated";
 import UserRelated from "../userRelated/UserRelated"
+import Suggestion from "../../suggestionPage/Suggestion";
 function Main() {
   const [activeComponent, setActiveComponent] = useState(null);
 
@@ -15,6 +16,8 @@ function Main() {
         return <ProjectRelated />;
       case "studentRelated":
         return <UserRelated />;
+      case "studentSuggestion":
+        return <Suggestion />;
       default:
         return (
           <div>
@@ -58,6 +61,13 @@ function Main() {
           variant="outline-success"
         >
           User Related
+        </Button>
+        <Button
+          onClick={() => setActiveComponent("studentSuggestion")}
+          className={styles.forButton}
+          variant="outline-success"
+        >
+     Student Suggestion
         </Button>
       </div>
 

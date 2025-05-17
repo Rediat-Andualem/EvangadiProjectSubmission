@@ -1,0 +1,23 @@
+.formPart{
+    width: 500px;
+    margin: 1% auto;
+    z-index: 900;
+
+}
+
+
+.projectForm {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+
+.forBold {
+  font-weight: bold;
+}
+
+.forItalic {
+  font-style: italic;
+}

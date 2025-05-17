@@ -151,7 +151,7 @@ function ProjectRelated() {
   return (
     <>
       <h2>Create Project</h2>
-      <div className={`${styles.formPart} mt-5`}>
+      <div className={`${styles.formPart} mt-5 container`}>
         {/* Responsive Image Grid */}
         {/* Submission Form */}
         <form onSubmit={handleSubmit} className={styles.projectForm}>

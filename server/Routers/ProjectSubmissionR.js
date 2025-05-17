@@ -14,7 +14,7 @@ let projectSubmissionRouter = express.Router();
 
 projectSubmissionRouter.post("/submitProject",authenticateToken, createProject);
 projectSubmissionRouter.get("/getStudentProject",authenticateToken,getProjectByStudent);
-projectSubmissionRouter.put("/updateStudentProject/:projectId",authenticateToken,updateProjectByStudent);
+projectSubmissionRouter.patch("/updateStudentProject/:projectId",authenticateToken,updateProjectByStudent);
 projectSubmissionRouter.delete("/deleteProject/:projectId",authenticateToken,deleteProject);
 projectSubmissionRouter.get("/fullInfo",authenticateToken, checkRole(["1"]),getAllProjectSubmissions);
 projectSubmissionRouter.post("/projectComment/:currentProjectId",authenticateToken, checkRole(["1"]),commentFromInstructors);

@@ -1,5 +1,4 @@
 change the email with the evangadi email
-login ketederege behuwala back belo mewetate yelebatem
-forgot password feature should be added as well
-admin page 
-        3. add instructor suggestion for evangadi (suggestion and display for recommended with delete)
+
+
+

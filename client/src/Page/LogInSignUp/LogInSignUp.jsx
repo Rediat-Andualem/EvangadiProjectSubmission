@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./LogInSignUp.css";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import {useNavigate} from 'react-router-dom'
+import { Link, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../utility/axiosInstance";
 import useSignIn from "react-auth-kit/hooks/useSignIn";
 import { jwtDecode } from "jwt-decode";
@@ -52,38 +52,50 @@ function LogInSignUp({ errorStatus }) {
     e.preventDefault();
     setError(null);
     setSuccess(null);
-  
+
     const nameRegex = /^[A-Za-z]+$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\+\d{6,15}$/;
-  
-    if (!nameRegex.test(signupData.userFirstName) || signupData.userFirstName.length > 15) {
-      setError("First name should contain only letters and not exceed 15 characters.");
+
+    if (
+      !nameRegex.test(signupData.userFirstName) ||
+      signupData.userFirstName.length > 15
+    ) {
+      setError(
+        "First name should contain only letters and not exceed 15 characters."
+      );
       return;
     }
-  
-    if (!nameRegex.test(signupData.userLastName) || signupData.userLastName.length > 15) {
-      setError("Last name should contain only letters and not exceed 15 characters.");
+
+    if (
+      !nameRegex.test(signupData.userLastName) ||
+      signupData.userLastName.length > 15
+    ) {
+      setError(
+        "Last name should contain only letters and not exceed 15 characters."
+      );
       return;
     }
-  
+
     if (!emailRegex.test(signupData.userEmail)) {
       setError("Please enter a valid email address.");
       return;
     }
-  
+
     if (!phoneRegex.test(signupData.userPhoneNumber)) {
-      setError("Phone number must start with a country code '+1345... or +251..");
+      setError(
+        "Phone number must start with a country code '+1345... or +251.."
+      );
       return;
     }
-  
+
     if (signupData.password.length < 6) {
       setError("Password must be at least 6 characters long.");
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const res = await axiosInstance.post("/users/createUser", signupData);
       // setSuccess(res?.data?.message);
@@ -97,7 +109,7 @@ function LogInSignUp({ errorStatus }) {
         Year: "",
         password: "",
       });
-  
+
       const token = res.headers["authorization"]?.split(" ")[1];
       const decodedToken = jwtDecode(token);
 
@@ -114,7 +126,7 @@ function LogInSignUp({ errorStatus }) {
               userEmail: decodedToken.userEmail,
               userName: decodedToken.userFirstName,
               role: decodedToken.role,
-              authStatus: true
+              authStatus: true,
             },
           })
         ) {
@@ -124,7 +136,7 @@ function LogInSignUp({ errorStatus }) {
         }
       }
     } catch (err) {
-      console.log(err)
+      console.log(err);
       setError(
         err?.response?.data?.errors || "Signup failed, please try again."
       );
@@ -132,7 +144,6 @@ function LogInSignUp({ errorStatus }) {
       setLoading(false);
     }
   };
-  
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -158,7 +169,7 @@ function LogInSignUp({ errorStatus }) {
               userEmail: decodedToken.userEmail,
               userName: decodedToken.userFirstName,
               role: decodedToken.role,
-              authStatus: true
+              authStatus: true,
             },
           })
         ) {
@@ -230,6 +241,11 @@ function LogInSignUp({ errorStatus }) {
                     {loading ? "Logging in..." : "Login"}
                   </button>
                 </div>
+                <div className="d-flex justify-content-end mt-2">
+                  <Link to="/emailforpassword" className="spn-signupIn">
+                    Forgot password?
+                  </Link>
+                </div>
               </form>
             </div>
           </div>
@@ -296,7 +312,9 @@ function LogInSignUp({ errorStatus }) {
                       onChange={handleSignupChange}
                       required
                     >
-                      <option value="" disabled>Select Group</option>
+                      <option value="" disabled>
+                        Select Group
+                      </option>
                       <option value="Group 1">Group 1</option>
                       <option value="Group 2">Group 2</option>
                       <option value="Group 3">Group 3</option>
@@ -310,7 +328,9 @@ function LogInSignUp({ errorStatus }) {
                       onChange={handleSignupChange}
                       required
                     >
-                      <option value="" disabled>Select Batch (Month)</option>
+                      <option value="" disabled>
+                        Select Batch (Month)
+                      </option>
                       <option value="January">January</option>
                       <option value="February">February</option>
                       <option value="March">March</option>
