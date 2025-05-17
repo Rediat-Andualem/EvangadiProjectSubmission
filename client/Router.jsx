@@ -22,9 +22,7 @@ function Routing() {
     <Route path="/emailforpassword" element={<LayOut showFooter={true} showHeader={true}><EmailForPassword/></LayOut>} />
     <Route path="/reset-password/:userId" element={<LayOut showFooter={true} showHeader={true}><PasswordUpdater/></LayOut>} />
       </Route>
-    <Route path="/signupLogIn" element={<LayOut showFooter={true} showHeader={true}><DashBoard/></LayOut>} />
- 
-
+    <Route path="/signupLogIn" element={<PublicOnlyRoute><LayOut showFooter={true} showHeader={true}><DashBoard/></LayOut></PublicOnlyRoute>} />
     {/* Protected route for authenticated users */}
     <Route element={<PrivateRoute />}>
     <Route path="/" element={<LayOut showFooter={true} showHeader={true}><ProjectSubmissionPage/></LayOut>} />
