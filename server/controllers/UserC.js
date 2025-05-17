@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const { sequelize, User, RefreshToken } = require("../models");
@@ -320,11 +320,10 @@ const allUserFinder = async (req, res) => {
       attributes: { exclude: ["password"] },
     });
 
-    // Filter out users with role "1" (e.g., super admin or admin)
     const filteredUsers = users.filter(user => user.role !== '1');
 
     if (filteredUsers.length === 0) {
-      return res.status(200).json({ message: ["No users found."] });
+      return res.status(200).json([]);
     }
 
     return res.status(200).json(filteredUsers);
@@ -359,6 +358,76 @@ const singleUserFinder = async (req, res) => {
 };
 
 
+
+const suggestStudent = async (req, res) => {
+  const { studentEmailAdress, suggestionValue } = req.body;
+  try {
+    // Find the user by email
+    const user = await User.findOne({ where: { userEmail: studentEmailAdress } });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found with provided email." });
+    }
+
+    // Update the suggestedForEvangadi field
+    user.suggestedForEvangadi = suggestionValue;
+    await user.save();
+
+    return res.status(200).json({ message: "Student suggestion submitted successfully." });
+  } catch (err) {
+    console.error("Error suggesting student:", err.message);
+    return res.status(500).json({ errors: [err.message] });
+  }
+};
+
+
+
+
+
+const allSuggestedStudentsFinder = async (req, res) => {
+  try {
+    // Fetch users with suggestedForEvangadi in ['0', '1', '2', '3']
+    const users = await User.findAll({
+      attributes: { exclude: ["password"] },
+      where: {
+        suggestedForEvangadi: ['0', '1', '2']
+      }
+    });
+
+    if (!users || users.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    return res.status(200).json(users);
+  } catch (err) {
+    console.error("Error fetching users:", err.message);
+    return res.status(500).json({ errors: [err.message] });
+  }
+};
+
+
+const reverseStudentSuggestion = async (req, res) => {
+  const { userId } = req.params;
+   console.log(req.user.role)
+  try {
+    // Check if user exists
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update suggestion status to '3' (currently under review)
+    user.suggestedForEvangadi = '3';
+    await user.save();
+
+    return res.status(200).json({ message: "User suggestion reversed successfully" });
+  } catch (error) {
+    console.error("Error reversing suggestion:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+
 module.exports = {
   userC,
   loginC,
@@ -367,4 +436,7 @@ module.exports = {
   updateUserPassword,
   allUserFinder,
   singleUserFinder,
+  allSuggestedStudentsFinder,
+  suggestStudent,
+  reverseStudentSuggestion
 };

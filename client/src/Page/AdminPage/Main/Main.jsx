@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import styles from "./Main.module.css";
 import StudentsRelated from "../studentsRelated/StudentRelated";
 import ProjectRelated from "../projectRelated/ProjectRelated";
-
+import UserRelated from "../userRelated/UserRelated"
 function Main() {
   const [activeComponent, setActiveComponent] = useState(null);
 
@@ -13,6 +13,8 @@ function Main() {
         return <StudentsRelated />;
       case "ProjectsForAdmin":
         return <ProjectRelated />;
+      case "studentRelated":
+        return <UserRelated />;
       default:
         return (
           <div>
@@ -41,7 +43,7 @@ function Main() {
           className={styles.forButton}
           variant="outline-success"
         >
-          Students Related
+          Submission related
         </Button>
         <Button
           onClick={() => setActiveComponent("ProjectsForAdmin")}
@@ -49,6 +51,13 @@ function Main() {
           variant="outline-success"
         >
           Project Related
+        </Button>
+        <Button
+          onClick={() => setActiveComponent("studentRelated")}
+          className={styles.forButton}
+          variant="outline-success"
+        >
+          User Related
         </Button>
       </div>
 

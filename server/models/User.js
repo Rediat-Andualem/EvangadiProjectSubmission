@@ -44,8 +44,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    suggestedForEvangadi: {
+      type: DataTypes.ENUM('0','1','2','3'),  // 0-perfect, 1-good, 2-reserved, 3-currently under review
+      allowNull: true,
+      defaultValue: "3"
+    },
+
     role: {
-      type: DataTypes.ENUM("0", "1", "2", "3", "4"), 
+      type: DataTypes.ENUM("0", "1", "2", "3", "4"),    
       defaultValue: "0",
     },
   }, {
@@ -75,7 +81,7 @@ module.exports = (sequelize, DataTypes) => {
         Batch: "admin",
         Year: "admin",
         password: hashedPassword,
-        role: "1", // adjust as per role meaning
+        role: "1", 
       },
     });
   };

@@ -2,8 +2,4 @@ change the email with the evangadi email
 login ketederege behuwala back belo mewetate yelebatem
 forgot password feature should be added as well
 admin page 
-        1. show student list using filter as well like the evangadi popup question.
-        2. instructor should give the review for the submitted and it should show over the student and also in the admin list 
-        3. add instructor suggestion for evangadi 
-        4. student suggestion form and display (optional create and delete feature)
-        5. deleting students feature (optional)
+        3. add instructor suggestion for evangadi (suggestion and display for recommended with delete)
