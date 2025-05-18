@@ -149,7 +149,7 @@ function ProjectRelated() {
   const paginationModel = { page: 0, pageSize: 3 };
 
   return (
-    <>
+    <div className={styles.mainProject}>
       <h2>Create Project</h2>
       <div className={`${styles.formPart} mt-5 container`}>
         {/* Responsive Image Grid */}
@@ -208,7 +208,7 @@ function ProjectRelated() {
         </form>
       </div>
 
-      <div className="text-underline container mx-auto row m-4">
+      <div className="container mx-auto row ">
         <hr />
         <h4 className="text-center">Created projects</h4>
 
@@ -331,7 +331,7 @@ function ProjectRelated() {
         )}
       </div>
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
-    </>
+    </div>
   );
 }
 

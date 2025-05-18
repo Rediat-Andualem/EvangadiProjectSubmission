@@ -21,10 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    projectType: {
-      type: DataTypes.STRING,
+    approvalForCertificate: {
+      type: DataTypes.ENUM('0','1'),
       allowNull: true,
-      defaultValue: "Individual",
+      defaultValue: "0",
     },
     ProjectUpdateStatus: {
       type: DataTypes.BOOLEAN,

@@ -84,7 +84,7 @@ function StudentRelated() {
     acc[key].push(project);
     return acc;
   }, {});
-
+console.log(fullInfo)
   const filteredAndGrouped = Object.entries(groupedData)
     .map(([groupKey, submittedProjects]) => {
       const filteredProjects = submittedProjects.filter((project) =>

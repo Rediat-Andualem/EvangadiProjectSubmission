@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import styles from "./Main.module.css";
 import StudentsRelated from "../studentsRelated/StudentRelated";
 import ProjectRelated from "../projectRelated/ProjectRelated";
-import UserRelated from "../userRelated/UserRelated"
+import UserRelated from "../userRelated/UserRelated";
 import Suggestion from "../../suggestionPage/Suggestion";
 function Main() {
   const [activeComponent, setActiveComponent] = useState(null);
@@ -21,15 +21,22 @@ function Main() {
       default:
         return (
           <div>
-            <h1 className="text-center text-decoration-underline">Select an option from the left</h1>
-            <ul>
-              <li >
-                To review student projects and view their status, select
-                "Student Related".
+            <h1 className="text-center text-decoration-underline m-3">
+              Select an option from the left
+            </h1>
+            <ul className="m-5 fw-bold">
+              <li className="m-3">
+                To review or view student projects and check their status,
+                select "Submission Related".
               </li>
-              <li>
+              <li className="m-3">
                 To create a project or manage all project-related tasks, select
                 "Project Related".
+              </li>
+              <li className="m-3">For user-related management, select "User Related".</li>
+              <li className="m-3">
+                To view student suggestions for Evangadi and related topics,
+                select "Student Suggestion".
               </li>
             </ul>
           </div>
@@ -67,7 +74,7 @@ function Main() {
           className={styles.forButton}
           variant="outline-success"
         >
-     Student Suggestion
+          Student Suggestion
         </Button>
       </div>
 

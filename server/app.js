@@ -14,6 +14,9 @@ app.use(cors({
 }))
 
 app.use('/api',AllRouters)
+app.get('/',(req,res)=>{
+  res.send('backend is working')
+})
 
 db.syncTablesInOrder().then(() => {
     app.listen(process.env.PORT, () => {
