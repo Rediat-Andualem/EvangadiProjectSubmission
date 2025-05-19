@@ -6,7 +6,7 @@ const PrivateRoute = () => {
   const auth = useAuthUser();
 
   if (!auth?.authStatus) {
-    return <Navigate to="/signupLogIn"/>;
+    return <Navigate to="/"/>;
   }
 
   return <Outlet />;

@@ -132,7 +132,7 @@ function LogInSignUp({ errorStatus }) {
         ) {
           navigate("/submitdb");
         } else {
-          navigate("/signUp");
+          navigate("/");
         }
       }
     } catch (err) {
@@ -175,7 +175,7 @@ function LogInSignUp({ errorStatus }) {
         ) {
           navigate("/submitdb");
         } else {
-          navigate("/signUp");
+          navigate("/");
         }
       }
     } catch (err) {

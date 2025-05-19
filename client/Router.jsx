@@ -18,14 +18,15 @@ function Routing() {
   return (
     // const verificationLink = `${baseURL}/users/verify/${base64EncodedJWT}/${base64EncodedKey}/${base64EncodedIV}`;
     <Routes>
-      <Route element={PublicOnlyRoute}>
     <Route path="/emailforpassword" element={<LayOut showFooter={true} showHeader={true}><EmailForPassword/></LayOut>} />
     <Route path="/reset-password/:userId" element={<LayOut showFooter={true} showHeader={true}><PasswordUpdater/></LayOut>} />
+      <Route element={PublicOnlyRoute}>
       </Route>
     <Route path="/signupLogIn" element={<PublicOnlyRoute><LayOut showFooter={true} showHeader={true}><DashBoard/></LayOut></PublicOnlyRoute>} />
+    <Route path="/" element={<PublicOnlyRoute><LayOut showFooter={true} showHeader={true}><DashBoard/></LayOut></PublicOnlyRoute>} />
     {/* Protected route for authenticated users */}
     <Route element={<PrivateRoute />}>
-    <Route path="/" element={<LayOut showFooter={true} showHeader={true}><ProjectSubmissionPage/></LayOut>} />
+    {/* <Route path="/" element={<LayOut showFooter={true} showHeader={true}><ProjectSubmissionPage/></LayOut>} /> */}
       <Route path="/submitdb" element={<LayOut showFooter={true} showHeader={true}><ProjectSubmissionPage /></LayOut>} />
       <Route path="/forAdmin" element={<LayOut showFooter={true} showHeader={true}><Admin /></LayOut>}/>
       <Route path="*" element={<LayOut showFooter={true} showHeader={true}><PageNotFound /></LayOut>}/>
