@@ -22,7 +22,7 @@ function Dashboard() {
               <LogInSignUp errorStatus={hideError} />
             </div>
           </div>
-          <div className="d-sm-none d-md-block col-12 col-md-6 explained">
+          <div className="d-none d-md-block col-12 col-md-6 explained">
             <h1 className="text-gradient">
               Welcome To Evangadi Project Submission Portal!
             </h1>

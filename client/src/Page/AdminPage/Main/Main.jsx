@@ -5,6 +5,7 @@ import StudentsRelated from "../studentsRelated/StudentRelated";
 import ProjectRelated from "../projectRelated/ProjectRelated";
 import UserRelated from "../userRelated/UserRelated";
 import Suggestion from "../../suggestionPage/Suggestion";
+import CertificateRelated from "../CertificateRelated/CertificatRelated";
 function Main() {
   const [activeComponent, setActiveComponent] = useState(null);
 
@@ -18,6 +19,8 @@ function Main() {
         return <UserRelated />;
       case "studentSuggestion":
         return <Suggestion />;
+      case "certificateRelated":
+        return <CertificateRelated />;
       default:
         return (
           <div>
@@ -68,6 +71,13 @@ function Main() {
           variant="outline-success"
         >
           User Related
+        </Button>
+        <Button
+          onClick={() => setActiveComponent("certificateRelated")}
+          className={styles.forButton}
+          variant="outline-success"
+        >
+          Certificate Related
         </Button>
         <Button
           onClick={() => setActiveComponent("studentSuggestion")}

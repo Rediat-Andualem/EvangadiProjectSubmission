@@ -6,7 +6,8 @@ const {
   updateProjectByStudent,
 getAllProjectSubmissions,
 updateAllowing,
-commentFromInstructors
+commentFromInstructors,
+forCertification
 } = require("../controllers/ProjectSubmissionC.js");
 const { checkRole, authenticateToken } = require("../Auth/Auth.js");
 
@@ -19,6 +20,7 @@ projectSubmissionRouter.delete("/deleteProject/:projectId",authenticateToken,del
 projectSubmissionRouter.get("/fullInfo",authenticateToken, checkRole(["1"]),getAllProjectSubmissions);
 projectSubmissionRouter.post("/projectComment/:currentProjectId",authenticateToken, checkRole(["1"]),commentFromInstructors);
 projectSubmissionRouter.patch("/updateAllowing/:projectId",authenticateToken, checkRole(["1"]),updateAllowing);
+projectSubmissionRouter.patch("/illegibility",authenticateToken, checkRole(["1"]),forCertification);
 
 
 

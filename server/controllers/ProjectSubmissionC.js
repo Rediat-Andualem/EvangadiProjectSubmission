@@ -268,6 +268,28 @@ const updateAllowing = async (req, res) => {
 };
 
 
+
+const forCertification = async (req, res) => {
+  const { Batch, Group, Year, Project } = req.body;
+
+  try {
+    const filtered = await ProjectSubmission.findAll({
+      where: {
+        Batch,
+        Group,
+        Year,
+        Project
+      }
+    });
+
+    return res.status(200).json({ success: true, data: filtered });
+  } catch (error) {
+    console.error('Error fetching project submissions:', error);
+    return res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
+
 module.exports = {
   createProject,
   deleteProject,
@@ -276,4 +298,5 @@ module.exports = {
   getAllProjectSubmissions,
   commentFromInstructors,
   updateAllowing,
+  forCertification
 };

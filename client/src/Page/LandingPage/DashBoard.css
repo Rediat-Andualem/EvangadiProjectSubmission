@@ -1,11 +1,4 @@
-/* .mainSection {
-    background-repeat: no-repeat;
-    background-size:cover;
-    padding-top: 15%;
-    margin-bottom: 50px;
-    background-image: url("./bg-svg-f.svg");
-    height: 100vh;
-} */
+
 .mainSection {
   background-image: url("./bg-svg-f.svg");
   background-size: cover;
