@@ -33,6 +33,7 @@ function Dashboard() {
               </li>
               <li>All projects must be submitted with a working link.</li>
               <li>All projects must be submitted before the deadline.</li>
+       <li>Make sure to avoid unnecessary spacing, as it will be taken into consideration.</li>
             </ul>
             {/* <img className="forAspImg" src={aspirePic} alt="" /> */}
             {/* <button

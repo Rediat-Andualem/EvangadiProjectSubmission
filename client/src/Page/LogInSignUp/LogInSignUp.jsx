@@ -48,18 +48,125 @@ function LogInSignUp({ errorStatus }) {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
   };
 
+  // const handleSignup = async (e) => {
+  //   e.preventDefault();
+  //   setError(null);
+  //   setSuccess(null);
+
+  //   const nameRegex = /^[A-Za-z]+$/;
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   const phoneRegex = /^\+\d{6,15}$/;
+
+  //   if (
+  //     !nameRegex.test(signupData.userFirstName) ||
+  //     signupData.userFirstName.length > 15
+  //   ) {
+  //     setError(
+  //       "First name should contain only letters and not exceed 15 characters."
+  //     );
+  //     return;
+  //   }
+
+  //   if (
+  //     !nameRegex.test(signupData.userLastName) ||
+  //     signupData.userLastName.length > 15
+  //   ) {
+  //     setError(
+  //       "Last name should contain only letters and not exceed 15 characters."
+  //     );
+  //     return;
+  //   }
+
+  //   if (!emailRegex.test(signupData.userEmail)) {
+  //     setError("Please enter a valid email address.");
+  //     return;
+  //   }
+
+  //   if (!phoneRegex.test(signupData.userPhoneNumber)) {
+  //     setError(
+  //       "Phone number must start with a country code '+1345... or +251.."
+  //     );
+  //     return;
+  //   }
+
+  //   if (signupData.password.length < 6) {
+  //     setError("Password must be at least 6 characters long.");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+
+  //   try {
+  //     const res = await axiosInstance.post("/users/createUser", signupData);
+  //     // setSuccess(res?.data?.message);
+  //     setSignupData({
+  //       userFirstName: "",
+  //       userLastName: "",
+  //       userEmail: "",
+  //       userPhoneNumber: "",
+  //       Group: "",
+  //       Batch: "",
+  //       Year: "",
+  //       password: "",
+  //     });
+
+  //     const token = res.headers["authorization"]?.split(" ")[1];
+  //     const decodedToken = jwtDecode(token);
+
+  //     if (token) {
+  //       if (
+  //         signIn({
+  //           auth: {
+  //             token,
+  //             type: "Bearer",
+  //             expiresIn: 4320,
+  //           },
+  //           userState: {
+  //             userId: decodedToken.userId,
+  //             userEmail: decodedToken.userEmail,
+  //             userName: decodedToken.userFirstName,
+  //             role: decodedToken.role,
+  //             authStatus: true,
+  //           },
+  //         })
+  //       ) {
+  //         navigate("/submitdb");
+  //       } else {
+  //         navigate("/");
+  //       }
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //     setError(
+  //       err?.response?.data?.errors || "Signup failed, please try again."
+  //     );
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleSignup = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+
+    const trimmedSignupData = {
+      ...signupData,
+      userFirstName: signupData.userFirstName.trim(),
+      userLastName: signupData.userLastName.trim(),
+      userEmail: signupData.userEmail.trim(),
+      userPhoneNumber: signupData.userPhoneNumber.trim(),
+      Group: signupData.Group.trim(),
+      Batch: signupData.Batch.trim(),
+      Year: signupData.Year.toString().trim(),
+    };
 
     const nameRegex = /^[A-Za-z]+$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\+\d{6,15}$/;
 
     if (
-      !nameRegex.test(signupData.userFirstName) ||
-      signupData.userFirstName.length > 15
+      !nameRegex.test(trimmedSignupData.userFirstName) ||
+      trimmedSignupData.userFirstName.length > 15
     ) {
       setError(
         "First name should contain only letters and not exceed 15 characters."
@@ -68,8 +175,8 @@ function LogInSignUp({ errorStatus }) {
     }
 
     if (
-      !nameRegex.test(signupData.userLastName) ||
-      signupData.userLastName.length > 15
+      !nameRegex.test(trimmedSignupData.userLastName) ||
+      trimmedSignupData.userLastName.length > 15
     ) {
       setError(
         "Last name should contain only letters and not exceed 15 characters."
@@ -77,12 +184,12 @@ function LogInSignUp({ errorStatus }) {
       return;
     }
 
-    if (!emailRegex.test(signupData.userEmail)) {
+    if (!emailRegex.test(trimmedSignupData.userEmail)) {
       setError("Please enter a valid email address.");
       return;
     }
 
-    if (!phoneRegex.test(signupData.userPhoneNumber)) {
+    if (!phoneRegex.test(trimmedSignupData.userPhoneNumber)) {
       setError(
         "Phone number must start with a country code '+1345... or +251.."
       );
@@ -97,8 +204,11 @@ function LogInSignUp({ errorStatus }) {
     setLoading(true);
 
     try {
-      const res = await axiosInstance.post("/users/createUser", signupData);
-      // setSuccess(res?.data?.message);
+      const res = await axiosInstance.post(
+        "/users/createUser",
+        trimmedSignupData
+      );
+
       setSignupData({
         userFirstName: "",
         userLastName: "",
@@ -145,14 +255,59 @@ function LogInSignUp({ errorStatus }) {
     }
   };
 
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setError(null);
+  //   setSuccess(null);
+
+  //   try {
+  //     const res = await axiosInstance.post("/users/login", loginData);
+  //     const token = res.headers["authorization"]?.split(" ")[1];
+  //     const decodedToken = jwtDecode(token);
+
+  //     if (token) {
+  //       if (
+  //         signIn({
+  //           auth: {
+  //             token,
+  //             type: "Bearer",
+  //             expiresIn: 4320,
+  //           },
+  //           userState: {
+  //             userId: decodedToken.userId,
+  //             userEmail: decodedToken.userEmail,
+  //             userName: decodedToken.userFirstName,
+  //             role: decodedToken.role,
+  //             authStatus: true,
+  //           },
+  //         })
+  //       ) {
+  //         navigate("/submitdb");
+  //       } else {
+  //         navigate("/");
+  //       }
+  //     }
+  //   } catch (err) {
+  //     setError(err?.response?.data?.message || "Invalid email or password");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccess(null);
 
+    const trimmedLoginData = {
+      userEmail: loginData.userEmail.trim(),
+      password: loginData.password,
+    };
+
     try {
-      const res = await axiosInstance.post("/users/login", loginData);
+      const res = await axiosInstance.post("/users/login", trimmedLoginData);
       const token = res.headers["authorization"]?.split(" ")[1];
       const decodedToken = jwtDecode(token);
 
@@ -200,6 +355,10 @@ function LogInSignUp({ errorStatus }) {
                   type="button"
                   data-bs-target="#carouselExample"
                   data-bs-slide="next"
+                  onClick={() => {
+                    setError(null);
+                    setSuccess(null);
+                  }}
                 >
                   Create a new account
                 </span>
@@ -261,6 +420,10 @@ function LogInSignUp({ errorStatus }) {
                   type="button"
                   data-bs-target="#carouselExample"
                   data-bs-slide="prev"
+                  onClick={() => {
+                    setError(null);
+                    setSuccess(null);
+                  }}
                 >
                   Sign In
                 </span>

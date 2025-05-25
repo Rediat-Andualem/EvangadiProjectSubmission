@@ -135,9 +135,9 @@ function StudentRelated() {
         </h4>
       ) : (
         <>
-          <Accordion defaultActiveKey="0">
+          <Accordion defaultActiveKey="0" className="">
             {paginatedData.map(({ groupKey, filteredProjects }, index) => (
-              <Accordion.Item eventKey={index.toString()} key={groupKey}>
+              <Accordion.Item eventKey={index.toString()} key={groupKey} className="m-3">
                 <Accordion.Header>{groupKey}</Accordion.Header>
                 <Accordion.Body>
                   <Paper sx={{ height: "90%", width: "100%", margin: "2%" }}>

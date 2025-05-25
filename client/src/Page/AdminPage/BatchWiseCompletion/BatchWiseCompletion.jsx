@@ -36,7 +36,7 @@ const ProjectFilter = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axiosInstance.post('/projectSubmission/illegibility', formData , { headers: { Authorization: authHeader } });
+      const res = await axiosInstance.post('/projectSubmission/batchCompletion', formData , { headers: { Authorization: authHeader } });
       setResults(res.data.data || []);
       setCurrentPage(1);
     } catch (error) {

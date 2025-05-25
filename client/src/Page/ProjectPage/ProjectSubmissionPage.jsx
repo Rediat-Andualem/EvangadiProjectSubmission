@@ -10,7 +10,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { PiSmileySadThin } from "react-icons/pi";
 import dayjs from "dayjs";
-//  for table view
+
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import Button from "react-bootstrap/Button";
@@ -52,30 +52,48 @@ function ProjectSubmissionPage() {
     }
   };
 
-  //  submit projects
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      let submitProject = await axiosInstance.post(
-        "/projectSubmission/submitProject",
-        formData,
-        {
-          headers: {
-            Authorization: authHeader,
-          },
-        }
-      );
-      toast.success("Project submitted successfully! 🎉");
-      getSubmittedProjects();
-    } catch (error) {
-      console.log(error);
-      toast.error(
-        error?.response.data
-          ? error.response.data.message
-          : "Something went wrong. Please try again."
-      );
-    }
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // Trim the links before submission
+  const trimmedFormData = {
+    ...formData,
+    githubCodeLink: formData.githubCodeLink.trim(),
+    deployedLink: formData.deployedLink.trim(),
   };
+
+  try {
+    let submitProject = await axiosInstance.post(
+      "/projectSubmission/submitProject",
+      trimmedFormData,
+      {
+        headers: {
+          Authorization: authHeader,
+        },
+      }
+    );
+
+    toast.success("Project submitted successfully! 🎉");
+
+    // Reset form
+    setFormData({
+      submittedProjectName: "",
+      githubCodeLink: "",
+      deployedLink: "",
+      projectType: "",
+      ReviewersComment: "",
+    });
+
+    getSubmittedProjects();
+  } catch (error) {
+    console.log(error);
+    toast.error(
+      error?.response?.data?.message || "Something went wrong. Please try again."
+    );
+  }
+};
+
 
   let deletePostedProject = async (projectId) => {
 
@@ -92,9 +110,7 @@ function ProjectSubmissionPage() {
     }
   };
 
-// projectSubmission/deleteProject/:projectId
 
-  // get submitted projects
   const getSubmittedProjects = async () => {
     try {
       let getSubmittedProjects = await axiosInstance.get(

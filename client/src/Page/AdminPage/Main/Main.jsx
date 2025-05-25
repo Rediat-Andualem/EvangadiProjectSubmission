@@ -5,7 +5,9 @@ import StudentsRelated from "../studentsRelated/StudentRelated";
 import ProjectRelated from "../projectRelated/ProjectRelated";
 import UserRelated from "../userRelated/UserRelated";
 import Suggestion from "../../suggestionPage/Suggestion";
-import CertificateRelated from "../CertificateRelated/CertificatRelated";
+import BatchWiseCompletion from "../BatchWiseCompletion/BatchWiseCompletion";
+import OverallCompletion from "../OverAllCompletion/OverallCompletion";
+import ForumAssigning from "../ForumAssigning/ForumAssigning"
 function Main() {
   const [activeComponent, setActiveComponent] = useState(null);
 
@@ -19,8 +21,12 @@ function Main() {
         return <UserRelated />;
       case "studentSuggestion":
         return <Suggestion />;
-      case "certificateRelated":
-        return <CertificateRelated />;
+      case "batchwiseCompletion":
+        return <BatchWiseCompletion />;
+      case "overallCompletion":
+        return <OverallCompletion />;
+      case "forumAssign":
+        return <ForumAssigning/>;
       default:
         return (
           <div>
@@ -73,11 +79,25 @@ function Main() {
           User Related
         </Button>
         <Button
-          onClick={() => setActiveComponent("certificateRelated")}
+          onClick={() => setActiveComponent("forumAssign")}
           className={styles.forButton}
           variant="outline-success"
         >
-          Certificate Related
+        Group assign for Forum
+        </Button>
+        <Button
+          onClick={() => setActiveComponent("batchwiseCompletion")}
+          className={styles.forButton}
+          variant="outline-success"
+        >
+          Batch wise  completion
+        </Button>
+        <Button
+          onClick={() => setActiveComponent("overallCompletion")}
+          className={styles.forButton}
+          variant="outline-success"
+        >
+          Overall completion
         </Button>
         <Button
           onClick={() => setActiveComponent("studentSuggestion")}

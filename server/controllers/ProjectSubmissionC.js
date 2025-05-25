@@ -268,26 +268,126 @@ const updateAllowing = async (req, res) => {
 };
 
 
-
-const forCertification = async (req, res) => {
-  const { Batch, Group, Year, Project } = req.body;
-
+const BatchWiseCompletion = async (req, res) => {
+  const { Batch, Group, Year, Project: ProjectName } = req.body;
+  console.log(req.user)
   try {
-    const filtered = await ProjectSubmission.findAll({
+    const filteredSubmissions = await ProjectSubmission.findAll({
       where: {
-        Batch,
-        Group,
-        Year,
-        Project
-      }
+        ReviewersComment: 'Accepted'
+      },
+      include: [
+        {
+          model: User,
+          where: {
+            Batch,
+            Group,
+            Year
+          },
+          attributes: ['userFirstName', 'userLastName', 'userEmail', 'userPhoneNumber', 'Batch', 'Group', 'Year']
+        },
+        {
+          model: Project,
+          where: ProjectName ? { nameOfProject: ProjectName } : {},
+          attributes: ['nameOfProject']
+        }
+      ]
     });
 
-    return res.status(200).json({ success: true, data: filtered });
+    const response = filteredSubmissions.map(submission => ({
+      firstName: submission.User.userFirstName,
+      lastName: submission.User.userLastName,
+      email: submission.User.userEmail,
+      phoneNumber: submission.User.userPhoneNumber,
+      batch: submission.User.Batch,
+      group: submission.User.Group,
+      year: submission.User.Year,
+      projectName: submission.Project.nameOfProject,
+      githubCodeLink: submission.githubCodeLink,
+      deployedLink: submission.deployedLink,
+      submittedProjectId: submission.submittedProjectId
+    }));
+
+    return res.status(200).json({ success: true, data: response });
   } catch (error) {
     console.error('Error fetching project submissions:', error);
     return res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
+
+
+const overAllCompletion = async (req, res) => {
+  const { Batch, Year } = req.body;
+
+  try {
+    // Step 1: Fetch all project IDs
+    const projects = await Project.findAll({
+      attributes: ['projectId'],
+    });
+
+    const projectIds = projects.map(project => project.projectId);
+
+    if (projectIds.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No projects found',
+      });
+    }
+
+   
+    const users = await User.findAll({
+      where: {
+        Batch,
+        Year,
+      },
+      attributes: ['userId', 'userFirstName', 'userLastName', 'userEmail', 'userPhoneNumber', 'Batch', 'Group', 'Year'],
+    });
+
+    const completedUsers = [];
+
+    for (const user of users) {
+  
+      const acceptedSubmissions = await ProjectSubmission.findAll({
+        where: {
+          userId: user.userId,
+          ReviewersComment: 'Accepted',
+          projectId: projectIds,
+        },
+        attributes: ['projectId'],
+      });
+
+      const acceptedProjectIds = acceptedSubmissions.map(sub => sub.projectId);
+
+   
+      const hasAllAccepted = projectIds.every(id => acceptedProjectIds.includes(id));
+
+      if (hasAllAccepted) {
+        completedUsers.push({
+          firstName: user.userFirstName,
+          lastName: user.userLastName,
+          email: user.userEmail,
+          phoneNumber: user.userPhoneNumber,
+          batch: user.Batch,
+          group: user.Group, 
+          year: user.Year,
+        });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: completedUsers,
+    });
+  } catch (error) {
+    console.error('Error in overAllCompletion:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server Error',
+    });
+  }
+};
+
+
 
 
 module.exports = {
@@ -298,5 +398,6 @@ module.exports = {
   getAllProjectSubmissions,
   commentFromInstructors,
   updateAllowing,
-  forCertification
+  BatchWiseCompletion,
+  overAllCompletion
 };
