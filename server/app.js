@@ -14,7 +14,7 @@ app.use(cors({
 }))
 
 app.use('/api',AllRouters)
-app.get('/',(req,res)=>{
+app.get('/test',(req,res)=>{
   res.send('backend is working')
 })
 
