@@ -51,9 +51,11 @@ const ProjectFilter = () => {
   const currentItems = results.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(results.length / itemsPerPage);
 
+  console.log(currentItems)
+
   return (
     <div className="container mt-4">
-      <form className="form-inline mb-4" onSubmit={handleSubmit}>
+      <form className="form-inline mb-4 container w-25" onSubmit={handleSubmit}>
         <div className="form-group mr-3">
           <label className="mr-2">Batch</label>
           <select
@@ -120,17 +122,17 @@ const ProjectFilter = () => {
           </select>
         </div>
 
-        <button type="submit" className="btn btn-primary">Fetch</button>
+        <button type="submit" className="btn btn-primary m-2">Get list</button>
       </form>
 
       <table className="table table-bordered">
         <thead>
           <tr>
             <th>#</th>
-            <th>Batch</th>
-            <th>Group</th>
-            <th>Year</th>
-            <th>Project</th>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Email</th>
+            <th>Phone number</th>
           </tr>
         </thead>
         <tbody>
@@ -138,16 +140,16 @@ const ProjectFilter = () => {
             currentItems.map((item, index) => (
               <tr key={index}>
                 <td>{indexOfFirstItem + index + 1}</td>
-                <td>{item.Batch}</td>
-                <td>{item.Group}</td>
-                <td>{item.Year}</td>
-                <td>{item.Project}</td>
+                <td>{item.firstName}</td>
+                <td>{item.lastName}</td>
+                <td>{item.email}</td>
+                <td>{item.phoneNumber}</td>
               </tr>
             ))
           ) : (
             <tr>
               <td colSpan="5" className="text-center">
-                No data found
+                No data to display
               </td>
             </tr>
           )}

@@ -10,6 +10,7 @@ import Button from "react-bootstrap/Button";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { PiSmileySadThin } from "react-icons/pi";
+import Link from "@mui/material/Link";
 function StudentRelated() {
   const [fullInfo, setFullInfo] = useState([]);
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -84,7 +85,7 @@ function StudentRelated() {
     acc[key].push(project);
     return acc;
   }, {});
-console.log(fullInfo)
+
   const filteredAndGrouped = Object.entries(groupedData)
     .map(([groupKey, submittedProjects]) => {
       const filteredProjects = submittedProjects.filter((project) =>
@@ -104,7 +105,13 @@ console.log(fullInfo)
     <div className={`container mt-4 ${styles.studentRelated}`}>
       <h3 className="mb-4">Submitted Projects</h3>
 
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "10px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: "10px",
+        }}
+      >
         <input
           type="text"
           placeholder="Search by Email"
@@ -123,9 +130,9 @@ console.log(fullInfo)
       </div>
 
       {paginatedData.length === 0 ? (
-       <h4>
-                  No project submitted so far! <PiSmileySadThin />{" "}
-                </h4>
+        <h4>
+          No project submitted so far! <PiSmileySadThin />{" "}
+        </h4>
       ) : (
         <>
           <Accordion defaultActiveKey="0">
@@ -136,11 +143,20 @@ console.log(fullInfo)
                   <Paper sx={{ height: "90%", width: "100%", margin: "2%" }}>
                     <DataGrid
                       rows={filteredProjects?.map((project, idx) => {
-                        const createdAtFormatted = dayjs(project.createdAt).format("DD/MM/YYYY");
-                        const createdAt = dayjs(createdAtFormatted, "DD/MM/YYYY");
-                        const deadline = dayjs(project.ProjectDeadLine, "DD/MM/YYYY");
+                        const createdAtFormatted = dayjs(
+                          project.createdAt
+                        ).format("DD/MM/YYYY");
+                        const createdAt = dayjs(
+                          createdAtFormatted,
+                          "DD/MM/YYYY"
+                        );
+                        const deadline = dayjs(
+                          project.ProjectDeadLine,
+                          "DD/MM/YYYY"
+                        );
                         const submittedOnTime =
-                          createdAt.isSame(deadline) || createdAt.isBefore(deadline);
+                          createdAt.isSame(deadline) ||
+                          createdAt.isBefore(deadline);
 
                         return {
                           id: idx,
@@ -156,21 +172,127 @@ console.log(fullInfo)
                           submissionStatus: submittedOnTime
                             ? "Submitted on time"
                             : "Not submitted on time",
-                          submissionStatusColor: submittedOnTime ? "green" : "red",
+                          submissionStatusColor: submittedOnTime
+                            ? "green"
+                            : "red",
                           projectActualId: project.submittedProjectId,
                           deleteStatus: project.ProjectUpdateStatus,
                         };
                       })}
+                      // columns={
+                      //   [
+                      //   { field: "username", headerName: "Student Name", width: 150 },
+                      //   { field: "userPhoneNumber", headerName: "Phone No", width: 150 },
+                      //   { field: "userEmail", headerName: "Email", width: 150 },
+                      //   { field: "nameOfProject", headerName: "Project Name", width: 150 },
+                      //   { field: "githubCodeLink", headerName: "GitHub Link", width: 200 },
+                      //   { field: "deployedLink", headerName: "Live Site", width: 200 },
+                      //   { field: "ReviewersComment", headerName: "Instructor Comment", width: 200 },
+                      //   { field: "submittedDate", headerName: "Submitted Date", width: 130 },
+                      //   { field: "projectDeadLine", headerName: "Deadline", width: 120 },
+                      //   {
+                      //     field: "submissionStatus",
+                      //     headerName: "Status",
+                      //     width: 170,
+                      //     renderCell: (params) => (
+                      //       <div
+                      //         style={{
+                      //           backgroundColor: params.row.submissionStatusColor,
+                      //           color: "white",
+                      //           padding: "5px 10px",
+                      //           borderRadius: "4px",
+                      //           textAlign: "center",
+                      //           width: "100%",
+                      //         }}
+                      //       >
+                      //         {params.row.submissionStatus}
+                      //       </div>
+                      //     ),
+                      //   },
+                      //   {
+                      //     field: "action",
+                      //     headerName: "Action",
+                      //     width: 150,
+                      //     renderCell: (params) =>
+                      //         <Button
+                      //           style={{ margin: "5px" }}
+                      //           onClick={() => openCommentModal(params.row.projectActualId)}
+                      //           variant="info"
+                      //         >
+                      //           Give Comment
+                      //         </Button>
+
+                      //   },
+                      // ]
+
                       columns={[
-                        { field: "username", headerName: "Student Name", width: 150 },
-                        { field: "userPhoneNumber", headerName: "Phone No", width: 150 },
+                        {
+                          field: "username",
+                          headerName: "Student Name",
+                          width: 150,
+                        },
+                        {
+                          field: "userPhoneNumber",
+                          headerName: "Phone No",
+                          width: 150,
+                        },
                         { field: "userEmail", headerName: "Email", width: 150 },
-                        { field: "nameOfProject", headerName: "Project Name", width: 150 },
-                        { field: "githubCodeLink", headerName: "GitHub Link", width: 200 },
-                        { field: "deployedLink", headerName: "Live Site", width: 200 },
-                        { field: "ReviewersComment", headerName: "Instructor Comment", width: 200 },
-                        { field: "submittedDate", headerName: "Submitted Date", width: 130 },
-                        { field: "projectDeadLine", headerName: "Deadline", width: 120 },
+                        {
+                          field: "nameOfProject",
+                          headerName: "Project Name",
+                          width: 150,
+                        },
+                        {
+                          field: "githubCodeLink",
+                          headerName: "GitHub Link",
+                          width: 200,
+                          renderCell: (params) =>
+                            params.row.githubCodeLink ? (
+                              <Link
+                                href={params.row.githubCodeLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                underline="hover"
+                              >
+                                click here
+                              </Link>
+                            ) : (
+                              "N/A"
+                            ),
+                        },
+                        {
+                          field: "deployedLink",
+                          headerName: "Live Site",
+                          width: 200,
+                          renderCell: (params) =>
+                            params.row.deployedLink ? (
+                              <Link
+                                href={params.row.deployedLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                underline="hover"
+                              >
+                                click here
+                              </Link>
+                            ) : (
+                              "N/A"
+                            ),
+                        },
+                        {
+                          field: "ReviewersComment",
+                          headerName: "Instructor Comment",
+                          width: 200,
+                        },
+                        {
+                          field: "submittedDate",
+                          headerName: "Submitted Date",
+                          width: 130,
+                        },
+                        {
+                          field: "projectDeadLine",
+                          headerName: "Deadline",
+                          width: 120,
+                        },
                         {
                           field: "submissionStatus",
                           headerName: "Status",
@@ -178,7 +300,8 @@ console.log(fullInfo)
                           renderCell: (params) => (
                             <div
                               style={{
-                                backgroundColor: params.row.submissionStatusColor,
+                                backgroundColor:
+                                  params.row.submissionStatusColor,
                                 color: "white",
                                 padding: "5px 10px",
                                 borderRadius: "4px",
@@ -194,15 +317,17 @@ console.log(fullInfo)
                           field: "action",
                           headerName: "Action",
                           width: 150,
-                          renderCell: (params) =>
-                              <Button
-                                style={{ margin: "5px" }}
-                                onClick={() => openCommentModal(params.row.projectActualId)}
-                                variant="info"
-                              >
-                                Give Comment
-                              </Button>
-                            
+                          renderCell: (params) => (
+                            <Button
+                              style={{ margin: "5px" }}
+                              onClick={() =>
+                                openCommentModal(params.row.projectActualId)
+                              }
+                              variant="info"
+                            >
+                              Give Comment
+                            </Button>
+                          ),
                         },
                       ]}
                       initialState={{ pagination: { paginationModel } }}
@@ -238,7 +363,9 @@ console.log(fullInfo)
               </span>
               <Button
                 variant="secondary"
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))
+                }
                 disabled={currentPage === totalPages - 1}
               >
                 Next
@@ -284,7 +411,10 @@ console.log(fullInfo)
               placeholder="Enter your comment"
             />
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Button variant="secondary" onClick={() => setShowCommentModal(false)}>
+              <Button
+                variant="secondary"
+                onClick={() => setShowCommentModal(false)}
+              >
                 Cancel
               </Button>
               <Button variant="primary" onClick={submitComment}>
