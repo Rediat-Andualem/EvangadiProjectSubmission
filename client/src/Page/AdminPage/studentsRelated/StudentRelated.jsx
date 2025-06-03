@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { PiSmileySadThin } from "react-icons/pi";
 import Link from "@mui/material/Link";
+import MoonLoader from 'react-spinners/MoonLoader'
 function StudentRelated() {
   const [fullInfo, setFullInfo] = useState([]);
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -18,6 +19,7 @@ function StudentRelated() {
   const [commentText, setCommentText] = useState("");
   const [searchEmail, setSearchEmail] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading]=useState(false)
   const itemsPerPage = 15;
 
   const authHeader = useAuthHeader();
@@ -64,6 +66,7 @@ function StudentRelated() {
   };
 
   const getFullSubmissionInfo = async () => {
+    setLoading(true)
     try {
       const infoContent = await axiosInstance.get(
         "/projectSubmission/fullInfo",
@@ -74,8 +77,10 @@ function StudentRelated() {
         }
       );
       setFullInfo(infoContent?.data || []);
+      setLoading(false)
     } catch (error) {
       console.log(error.message);
+      setLoading(false)
     }
   };
 
@@ -128,14 +133,17 @@ function StudentRelated() {
           }}
         />
       </div>
-
-      {paginatedData.length === 0 ? (
-        <h4>
-          No project submitted so far! <PiSmileySadThin />{" "}
-        </h4>
-      ) : (
-        <>
-          <Accordion defaultActiveKey="0" className="">
+{loading ? (
+  <div style={{ display: "flex", justifyContent: "center", marginTop: "2rem" }}>
+    <MoonLoader color="#FF8500" />
+  </div>
+) : paginatedData.length === 0 ? (
+  <h4>
+    No project submitted so far! <PiSmileySadThin />
+  </h4>
+) : (
+  <>
+     <Accordion defaultActiveKey="0" className="">
             {paginatedData.map(({ groupKey, filteredProjects }, index) => (
               <Accordion.Item eventKey={index.toString()} key={groupKey} className="m-3">
                 <Accordion.Header>{groupKey}</Accordion.Header>
@@ -372,8 +380,16 @@ function StudentRelated() {
               </Button>
             </div>
           )}
-        </>
-      )}
+  </>
+)}
+
+
+
+
+
+
+
+
 
       {/* Comment Modal */}
       {showCommentModal && (

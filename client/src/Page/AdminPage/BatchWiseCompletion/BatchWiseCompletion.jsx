@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 import { axiosInstance } from '../../../utility/axiosInstance';
+import ClipLoader from 'react-spinners/ClipLoader'
 const ProjectFilter = () => {
   const [projects, setProjects] = useState([]);
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const ProjectFilter = () => {
   });
   const [results, setResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [Loading,setLoading]=useState(false)
   const itemsPerPage = 10;
   const authHeader = useAuthHeader();
   useEffect(() => {
@@ -35,12 +37,15 @@ const ProjectFilter = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
     try {
       const res = await axiosInstance.post('/projectSubmission/batchCompletion', formData , { headers: { Authorization: authHeader } });
       setResults(res.data.data || []);
       setCurrentPage(1);
+      setLoading(false)
     } catch (error) {
       console.error('Error fetching filtered results:', error);
+      setLoading(false)
     }
   };
 
@@ -122,7 +127,7 @@ const ProjectFilter = () => {
           </select>
         </div>
 
-        <button type="submit" className="btn btn-primary m-2">Get list</button>
+       {Loading?  <button type="submit" className="btn btn-primary m-2"><ClipLoader size={1} /></button> : <button type="submit" className="btn btn-primary m-2"> Get list </button>} 
       </form>
 
       <table className="table table-bordered">

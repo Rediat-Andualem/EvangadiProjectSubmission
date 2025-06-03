@@ -11,6 +11,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import Button from "react-bootstrap/Button";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import ClipLoader  from 'react-spinners/ClipLoader'
 dayjs.extend(customParseFormat);
 function ProjectRelated() {
   const [formData, setFormData] = useState({
@@ -20,7 +21,7 @@ function ProjectRelated() {
     nameOfProject: "",
   });
   const [projectCollection, setProjectCollection] = useState([]);
-
+  const [loading , setLoading]=useState(false)
   useEffect(() => {
     getProjects();
   }, []);
@@ -51,7 +52,6 @@ function ProjectRelated() {
   //* creating project for student
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     // Validate deadline format
     const isValidDeadline = dayjs(
       formData.ProjectDeadLine,

@@ -1,6 +1,55 @@
 const { ProjectSubmission, Project, User } = require("../models");
 
+// const createProject = async (req, res) => {
+//  const { userId } = req.user;
+//   const {
+//     submittedProjectName,
+//     githubCodeLink,
+//     deployedLink,
+//     projectType,
+//     ReviewersComment,
+//   } = req.body;
+
+
+//   if (!submittedProjectName || !githubCodeLink || !userId) {
+//     return res.status(400).json({ message: "Missing required fields." });
+//   }
+
+//   try {
+//     if (deployedLink) {
+//       const existingProject = await ProjectSubmission.findOne({
+//         where: { deployedLink },
+//       });
+//       if (existingProject) {
+//         return res
+//           .status(400)
+//           .json({ message: "Deployed link already in use." });
+//       }
+//     }
+
+//     const newProject = await ProjectSubmission.create({
+//       projectId: submittedProjectName,
+//       githubCodeLink,
+//       deployedLink,
+//       projectType,
+//       ReviewersComment,
+//       userId,
+//     });
+
+//     return res
+//       .status(201)
+//       .json({ message: "Project Submitted successfully", project: newProject });
+//   } catch (error) {
+//     console.error("Error creating project:", error.message);
+//     return res
+//       .status(500)
+//       .json({ message: "Failed to create project", error: error.message });
+//   }
+// };
+
+
 const createProject = async (req, res) => {
+  const { userId } = req.user;
   const {
     submittedProjectName,
     githubCodeLink,
@@ -8,24 +57,40 @@ const createProject = async (req, res) => {
     projectType,
     ReviewersComment,
   } = req.body;
-  const { userId } = req.user;
 
-  if (!submittedProjectName || !githubCodeLink || !userId) {
+  if (!submittedProjectName || !githubCodeLink || !userId ) {
     return res.status(400).json({ message: "Missing required fields." });
   }
 
   try {
+    const existingProjectForType = await ProjectSubmission.findOne({
+      where: {
+        userId,
+        projectId:submittedProjectName,
+      },
+    });
+
+    if (existingProjectForType) {
+      return res.status(400).json({
+        message:
+          "Uploading multiple times is not allowed. You can update or delete the existing project.",
+      });
+    }
+
+
     if (deployedLink) {
-      const existingProject = await ProjectSubmission.findOne({
+      const existingProjectWithDeployedLink = await ProjectSubmission.findOne({
         where: { deployedLink },
       });
-      if (existingProject) {
-        return res
-          .status(400)
-          .json({ message: "Deployed link already in use." });
+
+      if (existingProjectWithDeployedLink) {
+        return res.status(400).json({
+          message: "Deployed link already in use.",
+        });
       }
     }
 
+    // Create new project
     const newProject = await ProjectSubmission.create({
       projectId: submittedProjectName,
       githubCodeLink,
@@ -35,16 +100,19 @@ const createProject = async (req, res) => {
       userId,
     });
 
-    return res
-      .status(201)
-      .json({ message: "Project Submitted successfully", project: newProject });
+    return res.status(201).json({
+      message: "Project submitted successfully.",
+      project: newProject,
+    });
   } catch (error) {
     console.error("Error creating project:", error.message);
-    return res
-      .status(500)
-      .json({ message: "Failed to create project", error: error.message });
+    return res.status(500).json({
+      message: "Failed to create project.",
+      error: error.message,
+    });
   }
 };
+
 
 const getProjectByStudent = async (req, res) => {
   const { userId } = req.user;
@@ -231,8 +299,10 @@ const commentFromInstructors = async (req, res) => {
       return res.status(404).json({ message: "Project submission not found." });
     }
 
-    // Update only the ReviewersComment field
-    await submission.update({ ReviewersComment: comment });
+   
+let normalizedComment = comment.trim().replace(/\s+/g, ' ');
+
+    await submission.update({ ReviewersComment: normalizedComment });
 
     return res
       .status(200)
@@ -326,7 +396,6 @@ const overAllCompletion = async (req, res) => {
     });
 
     const projectIds = projects.map(project => project.projectId);
-
     if (projectIds.length === 0) {
       return res.status(404).json({
         success: false,
@@ -334,7 +403,6 @@ const overAllCompletion = async (req, res) => {
       });
     }
 
-   
     const users = await User.findAll({
       where: {
         Batch,
@@ -345,8 +413,7 @@ const overAllCompletion = async (req, res) => {
 
     const completedUsers = [];
 
-    for (const user of users) {
-  
+    for (const user of users) {  
       const acceptedSubmissions = await ProjectSubmission.findAll({
         where: {
           userId: user.userId,
@@ -373,7 +440,6 @@ const overAllCompletion = async (req, res) => {
         });
       }
     }
-
     return res.status(200).json({
       success: true,
       data: completedUsers,

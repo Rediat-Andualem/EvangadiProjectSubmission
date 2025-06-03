@@ -8,21 +8,17 @@
 // import { DataGrid } from "@mui/x-data-grid";
 // import Paper from "@mui/material/Paper";
 // import Button from "react-bootstrap/Button";
+// import Modal from "react-bootstrap/Modal";
 
 // function UserRelated() {
-//   const [formData, setFormData] = useState({
-//     studentEmailAdress: "",
-//     suggestionValue: "",
-//   });
-
-//   const [users, setUser] = useState([]);
+//   const [users, setUsers] = useState([]);
 //   const [searchTerm, setSearchTerm] = useState("");
-//   const [suggestedStudents, setSuggestedStudents] = useState([]);
+//   const [showModal, setShowModal] = useState(false);
+//   const [selectedUserId, setSelectedUserId] = useState(null);
 //   const authHeader = useAuthHeader();
 
 //   useEffect(() => {
 //     getUsers();
-//     allSuggestedUsersFinder();
 //   }, []);
 
 //   const getUsers = async () => {
@@ -30,77 +26,39 @@
 //       const response = await axiosInstance.get("/users/allUsers", {
 //         headers: { Authorization: authHeader },
 //       });
-//       setUser(response.data);
+//       setUsers(response.data);
 //     } catch (error) {
 //       console.log(error.message);
 //     }
 //   };
 
-//   const deleteUser = async (userId) => {
-//     try {
-//       await axiosInstance.delete(`/users/deleteUser/${userId}`, {
-//         headers: { Authorization: authHeader },
-//       });
-//       getUsers();
-//     } catch (error) {
-//       console.error("Error deleting user:", error);
-//     }
+//   const handleShowModal = (userId) => {
+//     setSelectedUserId(userId);
+//     setShowModal(true);
 //   };
 
-//   const ReverseSuggestion = async (userId) => {
+//   const handleCloseModal = () => {
+//     setSelectedUserId(null);
+//     setShowModal(false);
+//   };
+
+//   const confirmDeleteUser = async () => {
 //     try {
-//       await axiosInstance.patch(
-//         `/users/reverseStudentSuggestion/${userId}`,
-//         {},
-//         {
-//           headers: { Authorization: authHeader },
-//         }
-//       );
-//       allSuggestedUsersFinder();
+//       await axiosInstance.delete(`/users/deleteUser/${selectedUserId}`, {
+//         headers: { Authorization: authHeader },
+//       });
+//       toast.success("User deleted successfully");
+//       getUsers();
 //     } catch (error) {
-//       console.error("Error reversing user suggestion:", error);
+//       toast.error("Failed to delete user");
+//     } finally {
+//       handleCloseModal();
 //     }
 //   };
 
 //   const filteredUsers = users.filter((user) =>
 //     user.userEmail.toLowerCase().includes(searchTerm.toLowerCase())
 //   );
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prev) => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       await axiosInstance.post("/users/suggestStudent", formData, {
-//         headers: { Authorization: authHeader },
-//       });
-
-//       setFormData({
-//         studentEmailAdress: "",
-//         suggestionValue: "",
-//       });
-//       toast.success("Student suggested successfully");
-//     } catch (error) {
-//       toast.error(
-//         error.response?.data?.message ||
-//           "Something went wrong, please check the email and try again"
-//       );
-//     }
-//   };
-
-//   const allSuggestedUsersFinder = async () => {
-//     try {
-//       const response = await axiosInstance.get("/users/findSuggestedStudents", {
-//         headers: { Authorization: authHeader },
-//       });
-//       setSuggestedStudents(response.data);
-//     } catch (error) {
-//       console.error("Failed to fetch suggested students:", error.message);
-//     }
-//   };
 
 //   const paginationModel = { page: 0, pageSize: 3 };
 
@@ -110,8 +68,7 @@
 //       <div className="text-underline container mx-auto row m-4">
 //         <hr />
 //         <h4 className="text-center">Students list</h4>
-
-//         {!users || users.length === 0 ? (
+//      {!users || users.length === 0 ? (
 //           <h4>
 //             No User to show <PiSmileySadThin />
 //           </h4>
@@ -155,13 +112,13 @@
 //                       params.row.deleteStatus ? (
 //                         <Button
 //                           style={{ margin: "5px" }}
-//                           onClick={() => deleteUser(params.row.deleteStatus)}
+//                           onClick={() => handleShowModal(params.row.deleteStatus)}
 //                           variant="danger"
 //                         >
 //                           Delete
 //                         </Button>
 //                       ) : (
-//                         "you can't update"
+//                         "Can't update"
 //                       ),
 //                     width: 150,
 //                   },
@@ -178,8 +135,23 @@
 //         )}
 //       </div>
 
- 
-
+//       {/* Confirm Delete Modal */}
+//       <Modal show={showModal} onHide={handleCloseModal} centered>
+//         <Modal.Header closeButton>
+//           <Modal.Title>Are you sure you want to delete this user?</Modal.Title>
+//         </Modal.Header>
+//         <Modal.Body>
+//           This action will not be reverted.
+//         </Modal.Body>
+//         <Modal.Footer>
+//           <Button variant="secondary" onClick={handleCloseModal}>
+//             Cancel
+//           </Button>
+//           <Button variant="danger" onClick={confirmDeleteUser}>
+//             Delete
+//           </Button>
+//         </Modal.Footer>
+//       </Modal>
 
 //       <ToastContainer position="top-right" autoClose={3000} />
 //     </>
@@ -187,7 +159,6 @@
 // }
 
 // export default UserRelated;
-// -------------------------------
 import React, { useEffect, useState } from "react";
 import styles from "./User.module.css";
 import { axiosInstance } from "../../../utility/axiosInstance";
@@ -199,12 +170,15 @@ import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import MoonLoader from "react-spinners/MoonLoader"; // <-- Add this if not already imported
 
 function UserRelated() {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [loading, setLoading] = useState(false); // <-- Add loading state
+
   const authHeader = useAuthHeader();
 
   useEffect(() => {
@@ -212,6 +186,7 @@ function UserRelated() {
   }, []);
 
   const getUsers = async () => {
+    setLoading(true); // Start loading
     try {
       const response = await axiosInstance.get("/users/allUsers", {
         headers: { Authorization: authHeader },
@@ -219,6 +194,9 @@ function UserRelated() {
       setUsers(response.data);
     } catch (error) {
       console.log(error.message);
+      toast.error("Failed to fetch users");
+    } finally {
+      setLoading(false); // Stop loading regardless of success/failure
     }
   };
 
@@ -259,7 +237,11 @@ function UserRelated() {
         <hr />
         <h4 className="text-center">Students list</h4>
 
-        {!users || users.length === 0 ? (
+        {loading ? (
+          <div style={{ display: "flex", justifyContent: "center", marginTop: "2rem" }}>
+            <MoonLoader color="#FF8500" />
+          </div>
+        ) : users.length === 0 ? (
           <h4>
             No User to show <PiSmileySadThin />
           </h4>
@@ -320,7 +302,6 @@ function UserRelated() {
                 sx={{ border: 2 }}
               />
             </Paper>
-
             <hr />
           </>
         )}
@@ -331,9 +312,7 @@ function UserRelated() {
         <Modal.Header closeButton>
           <Modal.Title>Are you sure you want to delete this user?</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          This action will not be reverted.
-        </Modal.Body>
+        <Modal.Body>This action will not be reverted.</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
             Cancel

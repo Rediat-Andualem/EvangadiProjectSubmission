@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 import { axiosInstance } from '../../../utility/axiosInstance';
 import { toast } from 'react-toastify';
+import ClipLoader from 'react-spinners/ClipLoader'
 
 const OverallCompletion = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ const OverallCompletion = () => {
   });
   const [results, setResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+    const [Loading,setLoading]=useState(false)
   const itemsPerPage = 10;
   const authHeader = useAuthHeader();
 
@@ -22,7 +24,7 @@ const OverallCompletion = () => {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
-
+setLoading(true)
 
   if (!/^\d{4}$/.test(formData.Year)) {
     toast.error('Year should be four digits');
@@ -36,9 +38,11 @@ const handleSubmit = async (e) => {
     }, { headers: { Authorization: authHeader } });
     setResults(res.data.data || []);
     setCurrentPage(1);
+  setLoading(false)
   } catch (error) {
     console.error('Error fetching filtered results:', error);
     toast.error('Error fetching data');
+    setLoading(false)
   }
 };
 
@@ -86,7 +90,7 @@ const handleSubmit = async (e) => {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary m-2">Get list</button>
+               {Loading?  <button type="submit" className="btn btn-primary m-2"><ClipLoader size={1} /></button> : <button type="submit" className="btn btn-primary m-2"> Get list </button>} 
       </form>
 
       <table className="table table-bordered">
