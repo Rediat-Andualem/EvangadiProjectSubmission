@@ -8,7 +8,13 @@ getAllProjectSubmissions,
 updateAllowing,
 commentFromInstructors,
 BatchWiseCompletion,
-overAllCompletion
+overAllCompletion,
+forAssignment,
+AssignToProject,
+getAssignedUsers,
+addCommentToStudent,
+addSuggestionToEvangadi,
+deleteAssigned
 } = require("../controllers/ProjectSubmissionC.js");
 const { checkRole, authenticateToken } = require("../Auth/Auth.js");
 
@@ -23,9 +29,14 @@ projectSubmissionRouter.post("/projectComment/:currentProjectId",authenticateTok
 projectSubmissionRouter.patch("/updateAllowing/:projectId",authenticateToken, checkRole(["1"]),updateAllowing);
 projectSubmissionRouter.post("/batchCompletion",authenticateToken, checkRole(["1"]),BatchWiseCompletion);
 projectSubmissionRouter.post("/overAllCompletion",authenticateToken, checkRole(["1"]),overAllCompletion);
+projectSubmissionRouter.post("/usersForForum",authenticateToken, checkRole(["1"]),forAssignment);
+projectSubmissionRouter.post("/assignProject",authenticateToken, checkRole(["1"]),AssignToProject);
+projectSubmissionRouter.post("/getAssignedStudents",authenticateToken, checkRole(["1"]),getAssignedUsers); 
+projectSubmissionRouter.post("/addSuggestionToEvangadi",authenticateToken, checkRole(["1"]),addSuggestionToEvangadi); 
+projectSubmissionRouter.post("/addCommentToStudent",authenticateToken, checkRole(["1"]),addCommentToStudent); 
+projectSubmissionRouter.delete('/deleteAssigned/:currentForumId',authenticateToken,checkRole(["1"]),deleteAssigned)
 
-
-
+ 
 
 module.exports = { projectSubmissionRouter };
 

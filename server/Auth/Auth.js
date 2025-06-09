@@ -7,7 +7,6 @@ const authenticateToken = (req, res, next) => {
     jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
         if (err) return res.sendStatus(403); 
         req.user = user; 
-      
         next();
     });
 };
@@ -17,7 +16,6 @@ const authenticateToken = (req, res, next) => {
 // roleMiddleware.js
 const checkRole = (roles) => {
     return (req, res, next) => {
-
         if (!roles.includes(req.user.role)) {
             return res.status(403).json({ message: 'Access denied. Insufficient permissions.' });
         }

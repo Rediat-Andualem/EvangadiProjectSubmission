@@ -44,11 +44,6 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'userId',
       onDelete: 'CASCADE',
     });
-
-    ProjectSubmission.belongsTo(models.Project, {
-      foreignKey: 'projectId',
-      onDelete: 'CASCADE',
-    });
   };
 
   return ProjectSubmission;

@@ -7,7 +7,8 @@ import UserRelated from "../userRelated/UserRelated";
 import Suggestion from "../../suggestionPage/Suggestion";
 import BatchWiseCompletion from "../BatchWiseCompletion/BatchWiseCompletion";
 import OverallCompletion from "../OverAllCompletion/OverallCompletion";
-import ForumAssigning from "../ForumAssigning/ForumAssigning"
+import ForumAssigning from "../ForumAssignement/ForumAssignement"
+import ProjectAssigned from "../ViewProjectAssigned/VewAssignedStudents";
 function Main() {
   const [activeComponent, setActiveComponent] = useState(null);
 
@@ -27,6 +28,8 @@ function Main() {
         return <OverallCompletion />;
       case "forumAssign":
         return <ForumAssigning/>;
+      case "viewProjectAssigned":
+        return <ProjectAssigned/>;
       default:
         return (
           <div>
@@ -43,6 +46,10 @@ function Main() {
                 "Project Related".
               </li>
               <li className="m-3">For user-related management, select "User Related".</li>
+              <li className="m-3">To assign students for a particular project use, select "Group assign for project"</li>
+              <li className="m-3">To view project assigned students, select "View project assigned students"</li>
+              <li className="m-3">To see all students who have completed a particular project successful , select "Batch wise completion"</li>
+              <li className="m-3">To see all students who have completed all given projects , select " over all completion"</li>
               <li className="m-3">
                 To view student suggestions for Evangadi and related topics,
                 select "Student Suggestion".
@@ -83,7 +90,14 @@ function Main() {
           className={styles.forButton}
           variant="outline-success"
         >
-        Group assign for Forum
+        Group assign for Project
+        </Button>
+        <Button
+          onClick={() => setActiveComponent("viewProjectAssigned")}
+          className={styles.forButton}
+          variant="outline-success"
+        >
+        View Project Assigned Students
         </Button>
         <Button
           onClick={() => setActiveComponent("batchwiseCompletion")}

@@ -1,4 +1,4 @@
-const { ProjectSubmission, Project, User } = require("../models");
+const { ProjectSubmission, Project, User, ForumTable } = require("../models");
 
 // const createProject = async (req, res) => {
 //  const { userId } = req.user;
@@ -453,8 +453,190 @@ const overAllCompletion = async (req, res) => {
   }
 };
 
+const forAssignment = async (req, res) => {
+  const { Batch, Group, Year } = req.body;
+  try {
+    const filteredUsers = await User.findAll({
+      where: {
+        Batch,
+        Group,
+        Year
+      },
+      attributes: ['userFirstName', 'userLastName', 'userEmail', 'userPhoneNumber' ,'userId','Batch','Year','Group']
+    });
+
+    const response = filteredUsers.map(user => ({
+      firstName: user.userFirstName,
+      lastName: user.userLastName,
+      email: user.userEmail,
+      phoneNumber: user.userPhoneNumber,
+      userID : user.userId,
+      Batch:user.Batch,
+      Year:user.Year,
+      InitialEvangadiGroup:user.Group
+
+    }));
+
+    return res.status(200).json({ success: true, data: response });
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
+const AssignToProject = async (req, res) => {
+  try {
+    const { userId, userEmail, projectId, Group, Batch,year } = req.body;
+    // Validate required fields
+    if (!userId || !userEmail || !projectId || !Group || !Batch) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    // Check if this user is already assigned to this project
+    const existingAssignment = await ForumTable.findOne({
+      where: {
+        userId,
+        projectId
+      }
+    });
+
+    if (existingAssignment) {
+      return res.status(400).json({
+        message: 'User is already assigned to this project.'
+      });
+    }
 
 
+    // Create new assignment record
+    const newAssignment = await ForumTable.create({
+      userId,
+      userEmail,
+      projectId,
+      year,
+      groupAssigned: Group,
+      batch: Batch,
+      assigned: true
+    });
+
+    res.status(201).json({
+      message: "Student successfully assigned to project",
+      // data: newAssignment
+    });
+
+  } catch (error) {
+    console.error('Error assigning student to project:', error);
+    res.status(500).json({ message: 'Internal server error', error });
+  }
+};
+
+const getAssignedUsers = async (req, res) => {
+  try {
+    const { Batch, Group, Year, projectId } = req.body;
+
+    const filteredUsers = await ForumTable.findAll({
+      where: {
+        batch: Batch,
+        groupAssigned: Group,
+        year: Year,
+        projectId
+      },
+      include: [
+        {
+          model: User,
+          attributes: ['userId', 'userFirstName', 'userLastName', 'userEmail', 'userPhoneNumber', 'Group', 'Batch', 'Year']
+        },
+        {
+          model: Project,
+          attributes: ['projectId', 'nameOfProject', 'projectDescription', 'projectResource', 'ProjectShowStatus', 'ProjectDeadLine']
+        }
+      ]
+    });
+
+    res.status(200).json({ data: filteredUsers });
+  } catch (error) {
+    console.error('Error fetching assigned users:', error);
+    res.status(500).json({ message: 'Failed to fetch assigned users', error });
+  }
+};
+
+const addCommentToStudent = async (req, res) => {
+  try {
+    const { forumtableId, message, projectId } = req.body;
+
+    if (!forumtableId || !message || !projectId) {
+      return res.status(400).json({ error: "Required fields missing." });
+    }
+
+    // Update ForumTable: commentToStudent
+    const forumUpdate = await ForumTable.update(
+      { commentToStudent: message },
+      { where: { forumtableId } }
+    );
+
+    // Update ProjectSubmission: ReviewersComment
+    const projectUpdate = await ProjectSubmission.update(
+      { ReviewersComment: message },
+      { where: { projectId } }
+    );
+
+    if (forumUpdate[0] === 0 && projectUpdate[0] === 0) {
+      return res.status(404).json({ error: "No matching records found." });
+    }
+
+    return res.status(200).json({ message: "Comment added successfully." });
+
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+const addSuggestionToEvangadi = async (req, res) => {
+  try {
+    const { forumtableId, message } = req.body;
+
+    if (!forumtableId || !message) {
+      return res.status(400).json({ error: "Required fields missing." });
+    }
+
+    // Update only the suggestionToEvangadi field
+    const updateResult = await ForumTable.update(
+      { suggestionToEvangadi: message },
+      { where: { forumtableId } }
+    );
+
+    if (updateResult[0] === 0) {
+      return res.status(404).json({ error: "ForumTable entry not found." });
+    }
+
+    return res.status(200).json({ message: "Suggestion added successfully." });
+
+  } catch (error) {
+    console.error("Error adding suggestion:", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+const deleteAssigned = async (req, res) => {
+  const { currentForumId } = req.params;
+console.log(currentForumId)
+  try {
+    const deletedRecord = await ForumTable.destroy({
+      where: {
+        forumtableId: currentForumId,
+      },
+    });
+
+    if (deletedRecord === 0) {
+      return res.status(404).json({ message: 'No record found with the given ID.' });
+    }
+
+    res.status(200).json({ message: 'User assignment deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting user assignment:', error);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+};
 
 module.exports = {
   createProject,
@@ -465,5 +647,11 @@ module.exports = {
   commentFromInstructors,
   updateAllowing,
   BatchWiseCompletion,
-  overAllCompletion
+  overAllCompletion,
+  forAssignment,
+  AssignToProject,
+  getAssignedUsers,
+  addCommentToStudent,
+  addSuggestionToEvangadi,
+  deleteAssigned
 };
