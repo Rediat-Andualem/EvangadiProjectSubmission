@@ -26,6 +26,7 @@ function ProjectSubmissionPage() {
   });
   const [projectCollection, setProjectCollection] = useState([]);
   const [submittedProjects, setSubmittedProjects] = useState([]);
+  console.log(submittedProjects)
   useEffect(() => {
     getProjects();
     getSubmittedProjects();
