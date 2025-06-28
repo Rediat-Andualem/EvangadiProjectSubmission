@@ -157,20 +157,11 @@ const forgotPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: "No user found with that email." });
+      return res.status(404).json({ message: "Password Reset Email sent!." });
     }
 
     const updateLink = `${process.env.FRONTEND_URL}/reset-password/${user.userId}`;
 
-    // await User.update(
-    //   {
-    //     passwordUpdateLink: updateLink,
-    //     passwordUpdateLinkCreatedAt: new Date(),
-    //   },
-    //   {
-    //     where: { userId: user.userId },
-    //   }
-    // );
 
     const mailSender = nodemailer.createTransport({
       service: "gmail",

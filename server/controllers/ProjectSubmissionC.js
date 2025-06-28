@@ -619,7 +619,6 @@ const addSuggestionToEvangadi = async (req, res) => {
 
 const deleteAssigned = async (req, res) => {
   const { currentForumId } = req.params;
-console.log(currentForumId)
   try {
     const deletedRecord = await ForumTable.destroy({
       where: {
