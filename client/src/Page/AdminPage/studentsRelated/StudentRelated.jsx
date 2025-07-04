@@ -11,15 +11,16 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { PiSmileySadThin } from "react-icons/pi";
 import Link from "@mui/material/Link";
-import MoonLoader from 'react-spinners/MoonLoader'
+import MoonLoader from "react-spinners/MoonLoader";
 function StudentRelated() {
   const [fullInfo, setFullInfo] = useState([]);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState(null);
+  const [commentType, setCommentType] = useState("");
   const [commentText, setCommentText] = useState("");
   const [searchEmail, setSearchEmail] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
-  const [loading, setLoading]=useState(false)
+  const [loading, setLoading] = useState(false);
   const itemsPerPage = 15;
 
   const authHeader = useAuthHeader();
@@ -30,8 +31,9 @@ function StudentRelated() {
     getFullSubmissionInfo();
   }, []);
 
-  const openCommentModal = (projectId) => {
+  const openCommentModal = (projectId, infoType) => {
     setCurrentProjectId(projectId);
+    setCommentType(infoType);
     setShowCommentModal(true);
   };
 
@@ -46,13 +48,15 @@ function StudentRelated() {
 
     try {
       await axiosInstance.post(
-        `/projectSubmission/projectComment/${currentProjectId}`,
+        commentType === "studentComment"
+          ? `/projectSubmission/projectComment/${currentProjectId}`
+          : `/projectSubmission/projectMemo/${currentProjectId}`,
         { comment: commentText },
         {
           headers: { Authorization: authHeader },
         }
       );
-
+console.log(currentProjectId,commentText)
       setCommentText("");
       setShowCommentModal(false);
       getFullSubmissionInfo();
@@ -66,7 +70,7 @@ function StudentRelated() {
   };
 
   const getFullSubmissionInfo = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const infoContent = await axiosInstance.get(
         "/projectSubmission/fullInfo",
@@ -77,10 +81,10 @@ function StudentRelated() {
         }
       );
       setFullInfo(infoContent?.data || []);
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
       console.log(error.message);
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -133,19 +137,30 @@ function StudentRelated() {
           }}
         />
       </div>
-{loading ? (
-  <div style={{ display: "flex", justifyContent: "center", marginTop: "2rem" }}>
-    <MoonLoader color="#FF8500" />
-  </div>
-) : paginatedData.length === 0 ? (
-  <h4>
-    No project submitted so far! <PiSmileySadThin />
-  </h4>
-) : (
-  <>
-     <Accordion defaultActiveKey="0" className="">
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            // justifyContent: "center",
+            marginTop: "2rem",
+
+          }}
+        >
+          <MoonLoader color="#FF8500" />
+        </div>
+      ) : paginatedData.length === 0 ? (
+        <h4>
+          No project submitted so far! <PiSmileySadThin />
+        </h4>
+      ) : (
+        <>
+          <Accordion defaultActiveKey="0" className="">
             {paginatedData.map(({ groupKey, filteredProjects }, index) => (
-              <Accordion.Item eventKey={index.toString()} key={groupKey} className="m-3">
+              <Accordion.Item
+                eventKey={index.toString()}
+                key={groupKey}
+                className="m-3"
+              >
                 <Accordion.Header>{groupKey}</Accordion.Header>
                 <Accordion.Body>
                   <Paper sx={{ height: "90%", width: "100%", margin: "2%" }}>
@@ -177,6 +192,7 @@ function StudentRelated() {
                           githubCodeLink: project.githubCodeLink,
                           submittedDate: createdAtFormatted,
                           projectDeadLine: project.ProjectDeadLine,
+                          ForEvangadi: project.MemoForEvangadi,
                           submissionStatus: submittedOnTime
                             ? "Submitted on time"
                             : "Not submitted on time",
@@ -187,52 +203,6 @@ function StudentRelated() {
                           deleteStatus: project.ProjectUpdateStatus,
                         };
                       })}
-                      // columns={
-                      //   [
-                      //   { field: "username", headerName: "Student Name", width: 150 },
-                      //   { field: "userPhoneNumber", headerName: "Phone No", width: 150 },
-                      //   { field: "userEmail", headerName: "Email", width: 150 },
-                      //   { field: "nameOfProject", headerName: "Project Name", width: 150 },
-                      //   { field: "githubCodeLink", headerName: "GitHub Link", width: 200 },
-                      //   { field: "deployedLink", headerName: "Live Site", width: 200 },
-                      //   { field: "ReviewersComment", headerName: "Instructor Comment", width: 200 },
-                      //   { field: "submittedDate", headerName: "Submitted Date", width: 130 },
-                      //   { field: "projectDeadLine", headerName: "Deadline", width: 120 },
-                      //   {
-                      //     field: "submissionStatus",
-                      //     headerName: "Status",
-                      //     width: 170,
-                      //     renderCell: (params) => (
-                      //       <div
-                      //         style={{
-                      //           backgroundColor: params.row.submissionStatusColor,
-                      //           color: "white",
-                      //           padding: "5px 10px",
-                      //           borderRadius: "4px",
-                      //           textAlign: "center",
-                      //           width: "100%",
-                      //         }}
-                      //       >
-                      //         {params.row.submissionStatus}
-                      //       </div>
-                      //     ),
-                      //   },
-                      //   {
-                      //     field: "action",
-                      //     headerName: "Action",
-                      //     width: 150,
-                      //     renderCell: (params) =>
-                      //         <Button
-                      //           style={{ margin: "5px" }}
-                      //           onClick={() => openCommentModal(params.row.projectActualId)}
-                      //           variant="info"
-                      //         >
-                      //           Give Comment
-                      //         </Button>
-
-                      //   },
-                      // ]
-
                       columns={[
                         {
                           field: "username",
@@ -288,7 +258,12 @@ function StudentRelated() {
                         },
                         {
                           field: "ReviewersComment",
-                          headerName: "Instructor Comment",
+                          headerName: "Comment For student",
+                          width: 200,
+                        },
+                        {
+                          field: "ForEvangadi",
+                          headerName: "Instructor Memo",
                           width: 200,
                         },
                         {
@@ -323,17 +298,41 @@ function StudentRelated() {
                         },
                         {
                           field: "action",
-                          headerName: "Action",
+                          headerName: "Student comment",
                           width: 150,
                           renderCell: (params) => (
                             <Button
                               style={{ margin: "5px" }}
                               onClick={() =>
-                                openCommentModal(params.row.projectActualId)
+                                openCommentModal(
+                                  params.row.projectActualId,
+                          
+                                  "studentComment"
+                                )
                               }
                               variant="info"
                             >
                               Give Comment
+                            </Button>
+                          ),
+                        },
+                        {
+                          field: "Memo",
+                          headerName: "Evangadi Memo",
+                          width: 150,
+                          renderCell: (params) => (
+                            <Button
+                              style={{ margin: "5px" }}
+                              onClick={() =>
+                                openCommentModal(
+                                  params.row.projectActualId,
+                         
+                                  "InstructorMemo"
+                                )
+                              }
+                              variant="warning"
+                            >
+                              Give Memo
                             </Button>
                           ),
                         },
@@ -380,16 +379,8 @@ function StudentRelated() {
               </Button>
             </div>
           )}
-  </>
-)}
-
-
-
-
-
-
-
-
+        </>
+      )}
 
       {/* Comment Modal */}
       {showCommentModal && (
