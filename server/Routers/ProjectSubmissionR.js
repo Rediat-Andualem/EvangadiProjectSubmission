@@ -14,7 +14,8 @@ AssignToProject,
 getAssignedUsers,
 addCommentToStudent,
 addSuggestionToEvangadi,
-deleteAssigned
+deleteAssigned,
+addInstructorMemo
 } = require("../controllers/ProjectSubmissionC.js");
 const { checkRole, authenticateToken } = require("../Auth/Auth.js");
 
@@ -35,6 +36,7 @@ projectSubmissionRouter.post("/getAssignedStudents",authenticateToken, checkRole
 projectSubmissionRouter.post("/addSuggestionToEvangadi",authenticateToken, checkRole(["1"]),addSuggestionToEvangadi); 
 projectSubmissionRouter.post("/addCommentToStudent",authenticateToken, checkRole(["1"]),addCommentToStudent); 
 projectSubmissionRouter.delete('/deleteAssigned/:currentForumId',authenticateToken,checkRole(["1"]),deleteAssigned)
+projectSubmissionRouter.post('/projectMemo/:submittedProjectId',authenticateToken,checkRole(["1"]),addInstructorMemo)
 
  
 

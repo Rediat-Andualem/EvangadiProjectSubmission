@@ -35,6 +35,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    MemoForEvangadi: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   }, {
     timestamps: true,
   });

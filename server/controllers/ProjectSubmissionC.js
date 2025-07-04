@@ -1,53 +1,5 @@
 const { ProjectSubmission, Project, User, ForumTable } = require("../models");
 
-// const createProject = async (req, res) => {
-//  const { userId } = req.user;
-//   const {
-//     submittedProjectName,
-//     githubCodeLink,
-//     deployedLink,
-//     projectType,
-//     ReviewersComment,
-//   } = req.body;
-
-
-//   if (!submittedProjectName || !githubCodeLink || !userId) {
-//     return res.status(400).json({ message: "Missing required fields." });
-//   }
-
-//   try {
-//     if (deployedLink) {
-//       const existingProject = await ProjectSubmission.findOne({
-//         where: { deployedLink },
-//       });
-//       if (existingProject) {
-//         return res
-//           .status(400)
-//           .json({ message: "Deployed link already in use." });
-//       }
-//     }
-
-//     const newProject = await ProjectSubmission.create({
-//       projectId: submittedProjectName,
-//       githubCodeLink,
-//       deployedLink,
-//       projectType,
-//       ReviewersComment,
-//       userId,
-//     });
-
-//     return res
-//       .status(201)
-//       .json({ message: "Project Submitted successfully", project: newProject });
-//   } catch (error) {
-//     console.error("Error creating project:", error.message);
-//     return res
-//       .status(500)
-//       .json({ message: "Failed to create project", error: error.message });
-//   }
-// };
-
-
 const createProject = async (req, res) => {
   const { userId } = req.user;
   const {
@@ -591,6 +543,40 @@ const addCommentToStudent = async (req, res) => {
   }
 };
 
+
+const addInstructorMemo = async (req, res) => {
+
+  const { submittedProjectId } = req.params;
+
+  try {
+    const { comment} = req.body;
+
+
+    if (!submittedProjectId || !comment) {
+    
+      return res.status(400).json({ error: "Required fields missing." });
+    }
+
+    const projectMeMoAdding = await ProjectSubmission.update(
+      { MemoForEvangadi: comment },
+      { where: { submittedProjectId} }
+    );
+
+    if (projectMeMoAdding[0] === 0) {
+      return res.status(404).json({ error: "No matching records found." });
+    }
+
+    return res.status(200).json({ message: "Memo added successfully." });
+
+  } catch (error) {
+    console.error("Error adding Memo:", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+
+
+
 const addSuggestionToEvangadi = async (req, res) => {
   try {
     const { forumtableId, message } = req.body;
@@ -652,5 +638,6 @@ module.exports = {
   getAssignedUsers,
   addCommentToStudent,
   addSuggestionToEvangadi,
-  deleteAssigned
+  deleteAssigned,
+  addInstructorMemo
 };
