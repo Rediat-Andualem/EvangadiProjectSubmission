@@ -127,7 +127,7 @@ console.log(currentProjectId,commentText)
           value={searchEmail}
           onChange={(e) => {
             setSearchEmail(e.target.value);
-            setCurrentPage(0); // Reset to first page on search
+            setCurrentPage(0); 
           }}
           style={{
             padding: "8px",
@@ -141,7 +141,7 @@ console.log(currentProjectId,commentText)
         <div
           style={{
             display: "flex",
-            // justifyContent: "center",
+            justifyContent: "center",
             marginTop: "2rem",
 
           }}
