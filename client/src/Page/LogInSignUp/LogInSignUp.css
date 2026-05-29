@@ -1,133 +1,254 @@
 .loginSignUp {
   text-align: center;
+  color: #ffffff;
 }
 
-span {
-  color: #192533;
-}
-span:hover {
-  text-decoration: underline;
-}
-form {
-  margin-top: 30px;
-}
+/* ============================================
+   HEADINGS
+============================================ */
 
-.form-input input {
-  padding: 10px 15px;
-  width: 100%;
-  margin-top: 15px;
-  border-radius: 5px;
-  border: 0.5px solid #cacaca;
-  outline: none;
-}
-
-.form-input select {
-  padding: 10px 15px;
-  width: 100%;
-  margin-top: 15px;
-  border-radius: 5px;
-  border: 0.5px solid #cacaca;
-  outline: none;
-}
- 
-.form-input input:focus {
-  /* animation: border-appear 0.2s linear; */
-  
-}
-@keyframes border-appear {
-  from {
-      border-bottom: 2px solid transparent; 
-      width: 0; 
-  }
-  to {
-      border-bottom: 2px solid #192533;
-      width: 100%; 
-  } 
+.login h5,
+.register h5 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #ffffff;
+  letter-spacing: 0.5px;
 }
 
 .login > div,
 .register > div {
   padding: 0 10px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  color: #b8c5d6;
 }
-.forgot a {
-  display: block;
+
+/* ============================================
+   LINKS / SWITCH AUTH
+============================================ */
+
+.spn-signupIn {
+  font-weight: 700;
+  color: #22d3ee;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.spn-signupIn:hover {
+  color: #67e8f9;
   text-decoration: none;
-  color: #192533;
-  text-align: right;
-  margin-top: 15px;
-}
-.forgot a:hover {
-  text-decoration: underline;
+  text-shadow: 0 0 12px rgba(34, 211, 238, 0.7);
 }
 
-.btn-login > button {
-  font-size: 1rem;
-  padding: 5px 10px;
-  width: 100%;
-  border-radius: 5px;
-  border: none;
+/* ============================================
+   FORM
+============================================ */
+
+form {
   margin-top: 30px;
-  color: white;
-  background-color: #192533;
 }
 
-.btn-login > button:hover {
-  background-color: #192533;
+/* ============================================
+   INPUTS
+============================================ */
+
+.form-input {
+  position: relative;
 }
-.btn-register > button {
-  font-size: 1rem;
-  padding: 5px 10px;
+
+.form-input input,
+.form-input select {
   width: 100%;
-  border-radius: 5px;
-  border: none;
-  margin-top: 20px;
-  color: white;
-  background-color: #192533;
-}
-.success-message{
-  color: #A34054;
-  font-weight: bold;
-}
-.spn-signupIn{
-  font-weight: bold;
-}
-.error-message{
-  color: red;
-  font-weight: bold;
-}
-.btn-register > button:hover {
-  background-color: #192533;
-}
-.privacy {
   margin-top: 15px;
-  font-size: 0.7rem;
-  a {
-    color: #192533;
-  }
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  outline: none;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 0 0 transparent;
 }
+
+/* IMPORTANT FOR DROPDOWN VISIBILITY */
+.form-input select option {
+  background: #111827;
+  color: #ffffff;
+}
+
+.form-input input::placeholder {
+  color: #94a3b8;
+}
+
+.form-input input:focus,
+.form-input select:focus {
+  border-color: #22d3ee;
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 0 0 3px rgba(34, 211, 238, 0.12),
+    0 0 18px rgba(34, 211, 238, 0.18);
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   PASSWORD EYE ICON
+============================================ */
+
 .password {
   position: relative;
 }
+
 .password span {
   position: absolute;
-  top: 35%;
+  top: 52%;
   right: 5%;
+  transform: translateY(-50%);
   font-size: 1.2rem;
-  color: #848484;
-}
-.password span:hover {
-  /* color: #192533; */
-  color: #A34054;
-}
-.disabled {
-  cursor: not-allowed;
-}
-.disabled:hover {
-  background-color: #848484 !important;
-}
-.spn-signupIn{
-  color: #A34054;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-/* background-color: #192533; */
+.password span:hover {
+  color: #22d3ee;
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+}
+
+/* ============================================
+   BUTTONS
+============================================ */
+
+.btn-login > button,
+.btn-register > button {
+  width: 100%;
+  margin-top: 28px;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  transition: all 0.35s ease;
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.3);
+}
+
+.btn-login > button:hover,
+.btn-register > button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 30px rgba(59, 130, 246, 0.45),
+    0 0 20px rgba(34, 211, 238, 0.25);
+}
+
+.btn-login > button:active,
+.btn-register > button:active {
+  transform: scale(0.98);
+}
+
+/* ============================================
+   FORGOT PASSWORD
+============================================ */
+
+.forgot a,
+a.spn-signupIn {
+  color: #22d3ee;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.forgot a:hover,
+a.spn-signupIn:hover {
+  color: #67e8f9;
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+}
+
+/* ============================================
+   SUCCESS / ERROR
+============================================ */
+
+.success-message {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  font-weight: 600;
+}
+
+.error-message {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  font-weight: 600;
+}
+
+/* ============================================
+   PRIVACY TEXT
+============================================ */
+
+.privacy {
+  margin-top: 15px;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.privacy a {
+  color: #22d3ee;
+  text-decoration: none;
+}
+
+/* ============================================
+   DISABLED BUTTON
+============================================ */
+
+.disabled,
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+button:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ============================================
+   CAROUSEL ANIMATION
+============================================ */
+
+.carousel-item {
+  transition: transform 0.6s ease-in-out;
+}
+
+/* ============================================
+   MOBILE
+============================================ */
+
+@media (max-width: 768px) {
+  .login h5,
+  .register h5 {
+    font-size: 1.6rem;
+  }
+
+  .form-input input,
+  .form-input select {
+    padding: 12px 14px;
+    font-size: 0.9rem;
+  }
+
+  .btn-login > button,
+  .btn-register > button {
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+}

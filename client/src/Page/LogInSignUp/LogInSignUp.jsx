@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../utility/axiosInstance";
 import useSignIn from "react-auth-kit/hooks/useSignIn";
 import { jwtDecode } from "jwt-decode";
+import logo from "../../assets/sizeOptionEvangadi/EvangadiFront.png";
 
 function LogInSignUp({ errorStatus }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -169,7 +170,7 @@ function LogInSignUp({ errorStatus }) {
       trimmedSignupData.userFirstName.length > 15
     ) {
       setError(
-        "First name should contain only letters and not exceed 15 characters."
+        "First name should contain only letters and not exceed 15 characters.",
       );
       return;
     }
@@ -179,7 +180,7 @@ function LogInSignUp({ errorStatus }) {
       trimmedSignupData.userLastName.length > 15
     ) {
       setError(
-        "Last name should contain only letters and not exceed 15 characters."
+        "Last name should contain only letters and not exceed 15 characters.",
       );
       return;
     }
@@ -191,7 +192,7 @@ function LogInSignUp({ errorStatus }) {
 
     if (!phoneRegex.test(trimmedSignupData.userPhoneNumber)) {
       setError(
-        "Phone number must start with a country code '+1345... or +251.."
+        "Phone number must start with a country code '+1345... or +251..",
       );
       return;
     }
@@ -206,7 +207,7 @@ function LogInSignUp({ errorStatus }) {
     try {
       const res = await axiosInstance.post(
         "/users/createUser",
-        trimmedSignupData
+        trimmedSignupData,
       );
 
       setSignupData({
@@ -248,7 +249,7 @@ function LogInSignUp({ errorStatus }) {
     } catch (err) {
       console.log(err);
       setError(
-        err?.response?.data?.errors || "Signup failed, please try again."
+        err?.response?.data?.errors || "Signup failed, please try again.",
       );
     } finally {
       setLoading(false);
@@ -395,17 +396,19 @@ function LogInSignUp({ errorStatus }) {
                     )}
                   </span>
                 </div>
+
                 <div className="btn-login">
                   <button disabled={loading} type="submit">
                     {loading ? "Logging in..." : "Login"}
                   </button>
                 </div>
-                <div className="d-flex justify-content-end mt-2">
+                <div className="d-flex justify-content-end my-2">
                   <Link to="/emailforpassword" className="spn-signupIn">
                     Forgot password?
                   </Link>
                 </div>
               </form>
+              <img src={logo} alt="" />
             </div>
           </div>
 

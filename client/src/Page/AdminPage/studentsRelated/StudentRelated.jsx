@@ -54,9 +54,9 @@ function StudentRelated() {
         { comment: commentText },
         {
           headers: { Authorization: authHeader },
-        }
+        },
       );
-console.log(currentProjectId,commentText)
+      console.log(currentProjectId, commentText);
       setCommentText("");
       setShowCommentModal(false);
       getFullSubmissionInfo();
@@ -78,7 +78,7 @@ console.log(currentProjectId,commentText)
           headers: {
             Authorization: authHeader,
           },
-        }
+        },
       );
       setFullInfo(infoContent?.data || []);
       setLoading(false);
@@ -98,7 +98,7 @@ console.log(currentProjectId,commentText)
   const filteredAndGrouped = Object.entries(groupedData)
     .map(([groupKey, submittedProjects]) => {
       const filteredProjects = submittedProjects.filter((project) =>
-        project.email.toLowerCase().includes(searchEmail.toLowerCase())
+        project.email.toLowerCase().includes(searchEmail.toLowerCase()),
       );
       return { groupKey, filteredProjects };
     })
@@ -108,11 +108,13 @@ console.log(currentProjectId,commentText)
 
   const paginatedData = filteredAndGrouped.slice(
     currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
+    (currentPage + 1) * itemsPerPage,
   );
   return (
     <div className={`container mt-4 ${styles.studentRelated}`}>
-      <h3 className="mb-4">Submitted Projects</h3>
+      <h3 style={{ color: "white" }} className="mb-4">
+        Submitted Projects
+      </h3>
 
       <div
         style={{
@@ -127,7 +129,7 @@ console.log(currentProjectId,commentText)
           value={searchEmail}
           onChange={(e) => {
             setSearchEmail(e.target.value);
-            setCurrentPage(0); 
+            setCurrentPage(0);
           }}
           style={{
             padding: "8px",
@@ -143,7 +145,6 @@ console.log(currentProjectId,commentText)
             display: "flex",
             justifyContent: "center",
             marginTop: "2rem",
-
           }}
         >
           <MoonLoader color="#FF8500" />
@@ -167,15 +168,15 @@ console.log(currentProjectId,commentText)
                     <DataGrid
                       rows={filteredProjects?.map((project, idx) => {
                         const createdAtFormatted = dayjs(
-                          project.createdAt
+                          project.createdAt,
                         ).format("DD/MM/YYYY");
                         const createdAt = dayjs(
                           createdAtFormatted,
-                          "DD/MM/YYYY"
+                          "DD/MM/YYYY",
                         );
                         const deadline = dayjs(
                           project.ProjectDeadLine,
-                          "DD/MM/YYYY"
+                          "DD/MM/YYYY",
                         );
                         const submittedOnTime =
                           createdAt.isSame(deadline) ||
@@ -306,8 +307,8 @@ console.log(currentProjectId,commentText)
                               onClick={() =>
                                 openCommentModal(
                                   params.row.projectActualId,
-                          
-                                  "studentComment"
+
+                                  "studentComment",
                                 )
                               }
                               variant="info"
@@ -326,8 +327,8 @@ console.log(currentProjectId,commentText)
                               onClick={() =>
                                 openCommentModal(
                                   params.row.projectActualId,
-                         
-                                  "InstructorMemo"
+
+                                  "InstructorMemo",
                                 )
                               }
                               variant="warning"

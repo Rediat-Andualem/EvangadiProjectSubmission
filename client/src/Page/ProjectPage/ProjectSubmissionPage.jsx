@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import styles from "./ProjectSubmissionPage.module.css";
 import amazon from "../../assets/Amazon.png";
+import chatGpt from "../../assets/ChatGPT.png";
 import netflix from "../../assets/netflix.png";
-import forum from "../../assets/forum.jpg";
-import portfolio from "../../assets/profile.jpg";
+import forum from "../../assets/forum.png";
+import portfolio from "../../assets/profile.png";
 import { axiosInstance } from "../../utility/axiosInstance";
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 import { toast, ToastContainer } from "react-toastify";
@@ -16,6 +17,7 @@ import Paper from "@mui/material/Paper";
 import Button from "react-bootstrap/Button";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
+
 function ProjectSubmissionPage() {
   const [formData, setFormData] = useState({
     submittedProjectName: "",
@@ -26,17 +28,18 @@ function ProjectSubmissionPage() {
   });
   const [projectCollection, setProjectCollection] = useState([]);
   const [submittedProjects, setSubmittedProjects] = useState([]);
-  console.log(submittedProjects)
+
   useEffect(() => {
     getProjects();
     getSubmittedProjects();
   }, []);
+
   const authHeader = useAuthHeader();
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // get projects
   const getProjects = async () => {
     try {
       let projectsList = await axiosInstance.get(
@@ -45,7 +48,7 @@ function ProjectSubmissionPage() {
           headers: {
             Authorization: authHeader,
           },
-        }
+        },
       );
       setProjectCollection(projectsList.data.projects);
     } catch (error) {
@@ -53,74 +56,72 @@ function ProjectSubmissionPage() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  // Trim the links before submission
-  const trimmedFormData = {
-    ...formData,
-    githubCodeLink: formData.githubCodeLink.trim(),
-    deployedLink: formData.deployedLink.trim(),
-  };
-
-  try {
-    let submitProject = await axiosInstance.post(
-      "/projectSubmission/submitProject",
-      trimmedFormData,
-      {
-        headers: {
-          Authorization: authHeader,
-        },
-      }
-    );
-
-    toast.success("Project submitted successfully! 🎉");
-
-    // Reset form
-    setFormData({
-      submittedProjectName: "",
-      githubCodeLink: "",
-      deployedLink: "",
-      projectType: "",
-      ReviewersComment: "",
-    });
-
-    getSubmittedProjects();
-  } catch (error) {
-    console.log(error);
-    toast.error(
-      error?.response?.data?.message || "Something went wrong. Please try again."
-    );
-  }
-};
-
-
-  let deletePostedProject = async (projectId) => {
+    const trimmedFormData = {
+      ...formData,
+      githubCodeLink: formData.githubCodeLink.trim(),
+      deployedLink: formData.deployedLink.trim(),
+    };
 
     try {
-      await axiosInstance.delete(`/projectSubmission/deleteProject/${projectId}`, {     
-        headers: {
-          Authorization: authHeader,
+      let submitProject = await axiosInstance.post(
+        "/projectSubmission/submitProject",
+        trimmedFormData,
+        {
+          headers: {
+            Authorization: authHeader,
+          },
         },
-      }); 
-     
+      );
+
+      toast.success("Project submitted successfully!");
+
+      setFormData({
+        submittedProjectName: "",
+        githubCodeLink: "",
+        deployedLink: "",
+        projectType: "",
+        ReviewersComment: "",
+      });
+
+      getSubmittedProjects();
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error?.response?.data?.message ||
+          "Something went wrong. Please try again.",
+      );
+    }
+  };
+
+  let deletePostedProject = async (projectId) => {
+    try {
+      await axiosInstance.delete(
+        `/projectSubmission/deleteProject/${projectId}`,
+        {
+          headers: {
+            Authorization: authHeader,
+          },
+        },
+      );
+
       getSubmittedProjects();
     } catch (error) {
       console.error("Error deleting answer:", error);
     }
   };
 
-
   const getSubmittedProjects = async () => {
     try {
       let getSubmittedProjects = await axiosInstance.get(
-        "/projectSubmission/getStudentProject",  
+        "/projectSubmission/getStudentProject",
         {
           headers: {
             Authorization: authHeader,
           },
-        }
+        },
       );
       setSubmittedProjects(getSubmittedProjects.data);
     } catch (error) {
@@ -128,11 +129,10 @@ const handleSubmit = async (e) => {
     }
   };
 
-  //  list of project name and picture at the top
   const projects = [
-    { name: "Netflix", img: netflix },
-    { name: "Amazon", img: amazon },
-    { name: "Evangadi Forum", img: forum },
+    { name: "AI Integrated Netflix Clone", img: netflix },
+    { name: "ChatGpt", img: chatGpt },
+    { name: "AI Integrated Evangadi Forum", img: forum },
     { name: "Portfolio Website", img: portfolio },
   ];
 
@@ -140,111 +140,149 @@ const handleSubmit = async (e) => {
 
   return (
     <>
-      <div className="container mx-auto row m-4">
-        {projects?.map((project, index) => (
-          <div className="col-6 col-md-3 text-center mb-3" key={index}>
-            <img
-              src={project.img}
-              alt={project.name}
-              className={`img-fluid rounded ${styles.projectImg}`}
-            />
-            <p className="mt-2 fw-bold">{project.name}</p>
-          </div>
-        ))}
+      <div className={styles.aiBackground}></div>
+
+      {/* Animated Alert Banner */}
+      <div className={styles.alertBanner}>
+        <marquee
+          behavior="scroll"
+          direction="left"
+          className={styles.marqueeText}
+        >
+          ✨ Please submit your projects on time. Certificates and other
+          necessary confirmations will only be provided to students who submit
+          their projects on time. ✨
+        </marquee>
       </div>
-      <marquee
-        behavior="scroll"
-        direction="left"
-        className=" fw-bold fst-italic"
-      >
-        Please submit your projects on time. Certificates and other necessary
-        confirmations will only be provided to students who submit their
-        projects on time.
-      </marquee>
 
-      <div className={`${styles.formPart} mt-5`}>
-        {/* Responsive Image Grid */}
-        {/* Submission Form */}
-        <form onSubmit={handleSubmit} className={styles.projectForm}>
-          <div className="mb-3">
-            <label className="form-label">Project Name</label>
-            <select
-              name="submittedProjectName"
-              value={formData.submittedProjectName}
-              onChange={handleChange}
-              className="form-select"
-              required
-            >
-              <option value="" disabled>
-                Select project
-              </option>
-              {projectCollection?.map((project, index) => (
-                <option key={index} value={project.projectId}>
-                  {/* {project.ProjectShowStatus ? (`Project name ${<b>${project.nameOfProject} </b>}, Project deadline :  ${project.ProjectDeadLine}` ): ""} */}
-
-                  {project.ProjectShowStatus ? (
-                    <>
-                      <p className={styles.forBold}>Project name : </p> <p className={styles.forItalic}>{project.nameOfProject}</p>, <p>Submission deadline:</p>
-                       <p>{project.ProjectDeadLine}</p>
-                    </>
-                  ) : null}
-                </option>
+      {/* Two Column Layout: Projects Left, Form Right */}
+      <div className={styles.twoColumnSection}>
+        {/* Left Column - Project Showcase Grid */}
+        <div className={styles.leftColumn}>
+          <div className={styles.projectShowcaseLeft}>
+            <div className={styles.leftColumnHeader}>
+              <h3>Featured Main Projects To Be Submitted</h3>
+              {/* <p>Explore and submit your work</p> */}
+            </div>
+            <div className={styles.projectGrid}>
+              {projects?.map((project, index) => (
+                <div className={styles.projectCard} key={index}>
+                  <div className={styles.projectCardInner}>
+                    <img
+                      src={project.img}
+                      alt={project.name}
+                      className={styles.projectImg}
+                    />
+                    <p className={styles.projectName}>{project.name}</p>
+                  </div>
+                </div>
               ))}
-            </select>
+            </div>
           </div>
+        </div>
 
-          <div className="mb-3">
-            <label className="form-label">GitHub Code Link</label>
-            <input
-              type="url"
-              name="githubCodeLink"
-              value={formData.githubCodeLink}
-              onChange={handleChange}
-              className="form-control"
-              placeholder="https://github.com/your-repo"
-              required
-            />
-          </div>
+        {/* Right Column - Submission Form */}
+        <div className={styles.rightColumn}>
+          <form onSubmit={handleSubmit} className={styles.projectForm}>
+            <div className={styles.formHeader}>
+              <h2>Submit Your Project</h2>
+              <p>Share your amazing work with us</p>
+            </div>
 
-          <div className="mb-3">
-            <label className="form-label">Deployed Link</label>
-            <input
-              type="url"
-              name="deployedLink"
-              value={formData.deployedLink}
-              onChange={handleChange}
-              className="form-control"
-              placeholder="https://your-project-link.com"
-              required
-            />
-          </div>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Project Name</label>
+              <select
+                name="submittedProjectName"
+                value={formData.submittedProjectName}
+                onChange={handleChange}
+                className={styles.formControl}
+                required
+              >
+                <option value="" disabled>
+                  Select project
+                </option>
+                {projectCollection?.map((project, index) => (
+                  <option key={index} value={project.projectId}>
+                    {project.ProjectShowStatus ? (
+                      <>
+                        <p className={styles.forBold}>Project name : </p>{" "}
+                        <p className={styles.forItalic}>
+                          {project.nameOfProject}
+                        </p>
+                        , <p>Submission deadline:</p>
+                        <p>{project.ProjectDeadLine}</p>
+                      </>
+                    ) : null}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <button type="submit" className="btn btn-primary w-100">
-            Submit Project
-          </button>
-        </form>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>GitHub Code Link</label>
+              <input
+                type="url"
+                name="githubCodeLink"
+                value={formData.githubCodeLink}
+                onChange={handleChange}
+                className={styles.formControl}
+                placeholder="https://github.com/your-repo"
+                required
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Deployed Link</label>
+              <input
+                type="url"
+                name="deployedLink"
+                value={formData.deployedLink}
+                onChange={handleChange}
+                className={styles.formControl}
+                placeholder="https://your-project-link.com"
+                required
+              />
+            </div>
+
+            <button type="submit" className={styles.submitBtn}>
+              <span>Submit Project</span>
+              <div className={styles.shimmer}></div>
+            </button>
+          </form>
+        </div>
       </div>
 
-      <div className="text-underline container mx-auto row m-4">
-        <hr />
-        <h4 className="text-center">Submitted projects</h4>
+      {/* Submitted Projects Section */}
+      <div className={styles.submittedSection}>
+        <div className={styles.sectionHeader}>
+          <h3 style={{ color: "white" }}>Your Submitted Projects</h3>
+          <div className={styles.headerLine}></div>
+        </div>
 
         {!submittedProjects || submittedProjects.length === 0 ? (
-          <h4>
-            No project submitted so far <PiSmileySadThin />{" "}
-          </h4>
+          <div className={styles.emptyState}>
+            <PiSmileySadThin className={styles.emptyIcon} />
+            <p>No project submitted so far</p>
+          </div>
         ) : (
-          <Paper sx={{ height: "90%", width: "100%", margin: "2%" }}>
+          <Paper
+            sx={{
+              height: "90%",
+              width: "100%",
+              margin: "2%",
+              backgroundColor: "rgba(255,255,255,0.95)",
+              borderRadius: "20px",
+              overflow: "hidden",
+            }}
+          >
             <DataGrid
               rows={submittedProjects?.map((project, index) => {
                 const createdAtFormatted = dayjs(project.createdAt).format(
-                  "DD/MM/YYYY"
+                  "DD/MM/YYYY",
                 );
 
                 const createdAt = dayjs(createdAtFormatted, "DD/MM/YYYY");
                 const deadline = dayjs(project.ProjectDeadLine, "DD/MM/YYYY");
-
-            
 
                 const submittedOnTime =
                   createdAt.isSame(deadline) || createdAt.isBefore(deadline);
@@ -260,9 +298,11 @@ const handleSubmit = async (e) => {
                   submissionStatus: submittedOnTime
                     ? "Submitted on time"
                     : "Not submitted on time",
-                  submissionStatusColor: submittedOnTime ? "green" : "red",
-                  projectActualId : project.submittedProjectId,
-                  deleteStatus: project.ProjectUpdateStatus
+                  submissionStatusColor: submittedOnTime
+                    ? "#10b981"
+                    : "#ef4444",
+                  projectActualId: project.submittedProjectId,
+                  deleteStatus: project.ProjectUpdateStatus,
                 };
               })}
               columns={[
@@ -301,10 +341,11 @@ const handleSubmit = async (e) => {
                       style={{
                         backgroundColor: params.row.submissionStatusColor,
                         color: "white",
-                        padding: "5px 10px",
-                        borderRadius: "4px",
+                        padding: "8px 12px",
+                        borderRadius: "6px",
                         textAlign: "center",
                         width: "100%",
+                        fontWeight: "500",
                       }}
                     >
                       {params.row.submissionStatus}
@@ -314,21 +355,19 @@ const handleSubmit = async (e) => {
                 {
                   field: "action",
                   headerName: "Action",
-                  renderCell: (params) => (
-               
-                    
-                      params.row.deleteStatus?(<> <Button
-                        style={{ margin: "5px" }}
-                        onClick={() => deletePostedProject(params.row.projectActualId)}
-                        variant="danger"
+                  renderCell: (params) =>
+                    params.row.deleteStatus ? (
+                      <Button
+                        onClick={() =>
+                          deletePostedProject(params.row.projectActualId)
+                        }
+                        className={styles.deleteBtn}
                       >
                         Delete
-                      </Button></>) :("you can't update")
-                    
-                      
-                    
-                  
-                  ),
+                      </Button>
+                    ) : (
+                      <span className={styles.noAction}>Cannot modify</span>
+                    ),
                   width: 150,
                 },
               ]}
